@@ -1,0 +1,336 @@
+//nabvar
+.app{
+    overflow: hidden !important;
+}
+.activeRoute{
+    color: yellow !important;
+    font-weight: bolder;
+}
+// modal
+bs-modal-backdrop{
+    display:none;
+}
+.modal {
+    background-color: #00000082;
+}
+.modal-dialog {
+    margin-top: 70px;
+}
+.modal-lg{
+    max-width: 1000px;
+}
+.mat-drawer.mat-drawer-side {
+    z-index: unset !important;
+}
+// .mat-drawer.mat-drawer-side {
+//     z-index: -1 !important;
+// }
+// .vod .mat-drawer-content{
+//     z-index: -1 !important;
+// }
+// Here you can add other styles
+.main{
+    background-color: white;
+}
+.side-nav-container {
+    width: auto;
+    min-height: calc(100vh - 55px);
+}
+.withpaddingTab ul{
+  padding-left: 10px;
+}
+.hambergerDIV {
+    width: 34px;
+    left: 0px;
+    position: absolute;
+    z-index: 10;
+}
+.side-nav-content {
+    height: calc(100vh - 53px);
+    border:solid 1px #ccc;
+}
+.side-nav-content-full {
+    min-height: 100vh;
+    border:solid 1px #ccc;
+}
+.sideNavChild-full{
+    height: calc(100vh - 39px);
+    overflow-y: auto;
+}
+.menuCursor{
+    cursor: pointer;
+}
+.side-nav-sidenav {
+    width: 300px;
+}
+.mat-drawer-inner-container {
+    overflow: hidden !important;
+}
+.nav-tile-text-bold{
+    padding: 4px 15px;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    color: #333;
+    font-size: 18px;
+    font-weight: bold;
+    background-color: aliceblue;
+}
+.nav-tile-text{
+    padding: 7px 30px;
+    border-bottom: 1px solid #ccc;
+    color: #333;
+    font-size: 14px;
+    background-color: aliceblue;
+}
+.toggle-tree-btn {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+}
+.toggle-tree-btn button{
+    padding: 0px 4px;
+    border-radius: 0px;
+    height: 25px;
+    border-color: #ccc;
+}
+.toggle-tree-btn-right {
+    position: absolute;
+    left: 10px;
+    top: 5px;
+}
+.toggle-tree-btn-right button{
+    padding: 0px 4px;
+    border-radius: 0px;
+    height: 25px;
+    border-color: #ccc;
+}
+.noBorder .tab-content {
+    border-bottom: 0px;
+    border-right: 0px;
+    border-left: 0px;
+}
+.treeViewOne .treeview-container{
+    max-height: calc(100vh - 230px) !important;
+}
+.rigid-btn{
+    border-radius: 0px;
+    min-width: 100px;
+}
+.rigid-btn-sm{
+    border-radius: 0px;
+    min-width: 70px;
+}
+.rigid-default{
+    border-color: #ccc;
+}
+.form-control{
+    border-color: #ccc;
+    border-radius: 0px;
+}
+//scrollbar
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey;
+    border-radius: 10px;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background:dimgray;
+    border-radius: 10px;
+  }
+  //checkbox
+  .mat-checkbox-frame {
+    border-width: 1px !important;
+}
+//form
+.error-i{
+   border-color: red;
+}
+.LabelGroup{
+    display: flex;
+}
+.LabelFlex{
+    height: min-content;
+    padding-right: 7px;
+}
+.LabelIcon{
+    position: absolute;
+    margin-top: 11px;
+    margin-left: 7px;
+}
+.fixWidthLabel{
+    width: 140px;
+    padding-top: 6px;
+    padding-right: 6px;
+    text-align: right;
+}
+.fixInputDiv{
+    width: calc(100% - 140px);
+}
+.fixWidthLabel-sm{
+    width: 50px;
+    padding-top: 6px;
+    padding-right: 6px;
+    text-align: right;
+}
+.invalid-feedback{
+    margin-top: 0px;
+}
+.fixInputDiv-sm{
+    width: calc(100% - 50px);
+}
+.dropzone-one{
+    height: 200px;
+    border: 2px dashed #ced4da;
+    background: #fff;
+    border-radius: 6px;
+}
+.dropzone-one img{
+    max-height: 200px;
+}
+.dropzone-imagediv{
+    margin: auto;
+    width: fit-content;
+}
+//table
+//table
+.mat-table-content-one{
+
+}
+.mat-table-content-one .mat-sort-header-container{
+    padding: 0px 11px !important;
+}
+.mat-table-content-one table {
+    width: 100%;
+}
+
+.mat-table-content-one .mat-form-field {
+    font-size: 14px;
+    width: 100%;
+ }
+.mat-table-content-one td {
+    min-width: 100px;
+    padding: 0px 11px !important;
+}
+.mat-table-content-one th {
+   color: black;
+   font-weight: bold;
+}
+.NoTh{
+    min-width: unset !important;
+    width: auto !important;
+    padding-left: 10px !important;
+}
+.NoTd{
+    min-width: unset !important;
+    width: auto !important;
+    padding-left: 10px !important;
+}
+.checkTable{
+    max-width: 100%;
+    overflow-x: auto;
+}
+.checkTh{
+    min-width: 50px !important;
+    width: 50px;
+    text-align: center !important;
+    padding: 5px !important;
+}
+.mat-table-sticky-border-elem-right {
+    border-left: 1px solid #e0e0e0;
+    z-index: 3
+  }
+
+  .mat-table-sticky-border-elem-left {
+    border-right: 1px solid #e0e0e0;
+  }
+  .mat-table-content-one th.mat-header-cell:first-of-type, td.mat-cell:first-of-type, td.mat-footer-cell:first-of-type {
+    padding-left: 13px;
+}
+.stickyOperationCell{
+    min-width: 170px !important;
+    text-align: center;
+}
+.stickyOperationCell-sm{
+    min-width: 100px !important;
+    text-align: center;
+}
+.stickyOperationHeader{
+    padding: 0px 37px !important;
+}
+.stickyOperationHeader-sm{
+    padding: 0px 37px !important;
+}
+.alarm-talbe-content tr.mat-header-row{
+    height: 33px;
+    background: aliceblue;
+}
+.alarm-talbe-content td {
+    min-width: 100px;
+    padding: 0px 11px !important;
+}
+.alarm-talbe-content tr.mat-row, tr.mat-footer-row {
+    height: 33px;
+}
+.alarm-talbe-content .mat-sort-header-container{
+    padding-left: 11px;
+}
+.btnCC{
+    cursor: pointer;
+    border-width: 0px;
+}
+.videoPlayer{
+    width: 100%;
+    height: auto;
+  }
+//multiselect
+.st1 .selected-item{
+    max-width: fit-content !important;
+}
+// animation
+@keyframes bigAndSmall {
+    0%   {transform: scale(1.0);}
+    25%  {transform: scale(1.1);}
+    50%  {transform: scale(1.2);}
+    75%  {transform: scale(1.1);}
+    100% {transform: scale(1.0);}
+  }
+
+  /* The element to apply the animation to */
+.bigAndSmall-anim {
+    animation-name: bigAndSmall;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+}
+@keyframes spining {
+    0%   {transform: rotate(0deg);}
+    25%  {transform: rotate(90deg);}
+    50%  {transform: rotate(180deg);}
+    75%  {transform: rotate(270deg);}
+    100% {transform: rotate(360deg);}
+  }
+
+  /* The element to apply the animation to */
+.rotate-anim {
+    animation-name: spining;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+}
+//date picker
+.example-custom-date-class {
+    background: orange;
+    border-radius: 100%;
+}
+.acc{
+    text-decoration: none !important;
+    cursor: pointer;
+}
+.form-error{
+    border-color: red !important;
+}

@@ -1,0 +1,30 @@
+<mat-drawer-container class="side-nav-container" autosize>
+    <mat-drawer #drawer class="side-nav-sidenav" mode="side" [opened]="true">
+      <div class="nav-tile-text-bold text-center">{{cf.translate('Video')}}</div>
+      <span class="toggle-tree-btn">
+        <button type="button" class="btn btn-block btn-outline" (click)="drawer.toggle(); _opened = !_opened">
+          <i class="fa fa-caret-left" aria-hidden="true"></i>
+        </button>
+      </span>
+    <!--Left tabs --> 
+    <div class="p-0">
+        <div [class]="curRoute&&curRoute.indexOf('/video/live')==0?'bg-primary menuCursor text-white':'menuCursor text-black'" (click)="route.navigateByUrl('/video/live')">
+            <div class="text-uppercase font-weight-bold text-left h6 p-2 pt-3 pb-3">{{cf.translate('Live')}}({{item?item.live.live:0}}/{{item?item.live.all:0}})</div>
+        </div>
+        <div [class]="curRoute&&curRoute.indexOf('/video/vod')==0?'bg-primary text-white menuCursor':'menuCursor text-black'" (click)="route.navigateByUrl('/video/vod')">
+            <div class="text-uppercase  font-weight-bold text-left h6 p-2 pt-3 pb-3">{{cf.translate('Vod')}}({{item?item.vod:0}})</div>
+        </div>
+    </div>
+    </mat-drawer>
+    <div *ngIf="!_opened" class="d-md-down-none hambergerDIV">
+        <span class="toggle-tree-btn-right">
+            <button type="button" class="btn btn-block btn-outline"
+              (click)="drawer.toggle(); _opened = !_opened">
+              <i class="fa fa-caret-right" aria-hidden="true"></i>
+            </button>
+        </span>
+    </div>
+    <div class="side-nav-content">
+        <router-outlet></router-outlet>
+    </div>
+</mat-drawer-container>

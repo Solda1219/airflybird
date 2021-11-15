@@ -1,0 +1,141 @@
+<div class="nav-tile-text">{{cf.translate('Camera manage')}}</div>
+<div class="content row p-3">
+
+    <div class="col-md-2">
+        <button type="button" type="submit" class="btn btn-primary rigid-btn" (click)="showCreateModal()">
+            <i class="fa fa-plus fa-lg"></i>{{cf.translate('Create Camera')}}
+        </button>
+    </div>
+    <div class="col-md-3 col-sm-6 noPadding">
+        <select type="number" class="form-control" [(ngModel)]="param.expire" (change)="setTableList()">
+            <option value="0">{{cf.translate('All')}}</option>
+            <option value="1">{{cf.translate('Expired')}}</option>
+            <option value="2">{{cf.translate('About to expire')}}</option>
+            <option value="3">{{cf.translate('Available')}}</option>
+            <!-- <option value="3">Expiring soon(User)</option>
+        <option value="4">Expired(User)</option> -->
+        </select>
+    </div>
+    <div class="col-md-3 col-sm-6 noPadding">
+        <select type="number" class="form-control" [(ngModel)]="param.install" (change)="setTableList()">
+            <option value="0">{{cf.translate('All')}}</option>
+            <option value="1">{{cf.translate('Installed')}}</option>
+            <option value="2">{{cf.translate('Not Installed')}}</option>
+        </select>
+    </div>
+    <div class="col-md-4 noPadding">
+        <button type="button" class="btn btn-primary rigid-btn" (click)="search()">Search</button>
+        <button type="button" class="btn btn-outline-dark rigid-btn rigid-default"
+            (click)="exportToExcel()">Export</button>
+    </div>
+</div>
+<div class="p-3">
+    <app-eq-camera-table [item]="tableList" (openEditModal)="showEditModal($event)" (deleteItems)="del($event)" (resetItems)="resetTerm($event)"></app-eq-camera-table>
+</div>
+<!-- loading -->
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+
+<!-- modalpart -->
+<!--creation modal -->
+<div bsModal [config]="{backdrop: 'static',  keyboard: false}" #createModal="bs-modal" class="modal fade p-3"
+    tabindex="-1" role="dialog" aria-labelledby="streamModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form #myform="ngForm" *ngIf="formGroup" [formGroup]="formGroup"
+                (submit)="(formGroup.value['id']?edit():create())">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        {{!formGroup.value.id?cf.translate('Create Camera'):cf.translate('Edit Camera')}}</h5>
+                    <button type="button" class="close" (click)="createModal.hide();" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body  pl-5 pr-5">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Camera ID')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]="" formControlName="camera_id">
+                                    <div *ngIf="formGroup.get('camera_id').invalid && (myform.submitted||formGroup.get('camera_id').dirty || formGroup.get('camera_id').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Camera Type')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]="" formControlName="camera_type">
+                                    <div *ngIf="formGroup.get('camera_type').invalid && (myform.submitted||formGroup.get('camera_type').dirty || formGroup.get('camera_type').touched)"  class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}} </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Device IMEI')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]=""
+                                        formControlName="device_imei">
+                                    <div *ngIf="formGroup.get('device_imei').invalid && (myform.submitted||formGroup.get('device_imei').dirty || formGroup.get('device_imei').touched)" class="invalid-feedback" style="display: block;"> {{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Manufacturer')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]=""
+                                        formControlName="manufacturer">
+                                    <div *ngIf="formGroup.get('manufacturer').invalid && (myform.submitted||formGroup.get('manufacturer').dirty || formGroup.get('manufacturer').touched)" class="invalid-feedback" style="display: block;"> {{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('production date')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="date" class="form-control" [placeholder]=""
+                                        formControlName="production_date">
+                                    <div *ngIf="formGroup.get('production_date').invalid && (myform.submitted||formGroup.get('production_date').dirty || formGroup.get('production_date').touched)" class="invalid-feedback" style="display: block;"> {{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Storage Date')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="date" class="form-control" [placeholder]=""
+                                        formControlName="storage_date">
+                                    <div *ngIf="formGroup.get('storage_date').invalid && (myform.submitted||formGroup.get('storage_date').dirty || formGroup.get('storage_date').touched)" class="invalid-feedback" style="display: block;"> {{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Camera Parameters')}}</label>
+                                <div class="fixInputDiv">
+                                    <textarea type="date" class="form-control"
+                                        formControlName="parameter"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        (click)="createModal.hide()">{{cf.translate("Close")}}</button>
+                    <button type="submit"
+                        class="btn btn-primary">{{!formGroup.value.id?cf.translate('Create'):cf.translate('Edit')}}</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

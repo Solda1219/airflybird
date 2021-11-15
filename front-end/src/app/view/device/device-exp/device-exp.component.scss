@@ -1,0 +1,76 @@
+.autoResizeTextArea{
+    height: 35px;
+    width:97%;
+    overflow-y: hidden;
+    position: absolute;
+}
+.autoResizeTextArea:focus{
+    height: 200px;
+    overflow-y: auto;
+    z-index: 10;
+}
+.autoCT{
+    min-height: 35px;
+}
+.noPadding{
+    padding-right: 8px;
+    padding-left: 0px;
+}
+.btnRow{
+    display: flex;
+    flex-wrap: wrap;
+}
+.btnRow .btn-group{
+    padding: 0px 3px;
+}
+.btnCC{
+    cursor: pointer;
+}
+//table
+.mat-table-content-one{
+
+}
+.mat-table-content-one table {
+    width: 100%;
+}
+  
+.mat-table-content-one .mat-form-field {
+    font-size: 14px;
+    width: 100%;
+ }
+  
+.mat-table-content-one td, th {
+    min-width: 100px;
+    padding: 0px 5px !important;
+}
+.mat-table-content-one th {
+   color: black;
+   font-weight: bold;
+}
+.checkTable{
+    max-width: 100%;
+    overflow-x: auto;
+}  
+.checkTh{
+    min-width: 50px !important;
+    width: 50px;
+    text-align: center !important;
+    padding: 5px !important;
+}
+.mat-table-sticky-border-elem-right {
+    border-left: 1px solid #e0e0e0;
+    z-index: 3  
+  }
+  
+  .mat-table-sticky-border-elem-left {
+    border-right: 1px solid #e0e0e0;
+  }
+  .mat-table-content-one th.mat-header-cell:first-of-type, td.mat-cell:first-of-type, td.mat-footer-cell:first-of-type {
+    padding-left: 13px;
+}
+.stickyOperationCell{
+    min-width: 170px !important;  
+}
+.stickyOperationHeader{
+    padding: 0px 37px !important;
+}

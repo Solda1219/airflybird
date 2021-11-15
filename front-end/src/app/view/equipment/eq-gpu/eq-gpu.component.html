@@ -1,0 +1,191 @@
+<div class="nav-tile-text">{{cf.translate('GPU server manage')}}</div>
+<div class="content row p-3">
+
+    <div class="col-md-2">
+        <button type="button" type="submit" class="btn btn-primary rigid-btn" (click)="showCreateModal()">
+            <i class="fa fa-plus fa-lg"></i>{{cf.translate('Create Server')}}
+        </button>
+    </div>
+    <!-- <div class="col-md-3 col-sm-6 noPadding">
+        <select type="number" class="form-control" [(ngModel)]="param.expire" (change)="setTableList()">
+            <option value="0">{{cf.translate('All')}}</option>
+            <option value="1">{{cf.translate('Expired')}}</option>
+            <option value="2">{{cf.translate('About to expire')}}</option>
+            <option value="3">{{cf.translate('Available')}}</option>
+        </select>
+    </div>
+    <div class="col-md-3 col-sm-6 noPadding">
+        <select type="number" class="form-control" [(ngModel)]="param.install" (change)="setTableList()">
+            <option value="0">{{cf.translate('All')}}</option>
+            <option value="1">{{cf.translate('Installed')}}</option>
+            <option value="2">{{cf.translate('Not Installed')}}</option>
+        </select>
+    </div> -->
+    <!-- <div class="col-md-4 noPadding">
+        <button type="button" class="btn btn-primary rigid-btn" (click)="search()">Search</button>
+        <button type="button" class="btn btn-outline-dark rigid-btn rigid-default"
+            (click)="exportToExcel()">Export</button>
+    </div> -->
+</div>
+<div class="p-3">
+    <app-eq-gpu-table [item]="tableList" (openEditModal)="showEditModal($event)" (deleteItems)="del($event)" (editItems)="editList($event)"></app-eq-gpu-table>
+</div>
+<!-- loading -->
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+
+<!-- modalpart -->
+<!--creation modal -->
+<div bsModal [config]="{backdrop: 'static',  keyboard: false}" #createModal="bs-modal" class="modal fade p-3"
+    tabindex="-1" role="dialog" aria-labelledby="streamModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form #myform="ngForm" *ngIf="formGroup" [formGroup]="formGroup"
+                (submit)="formGroup.value['id']?edit():create()">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        {{!formGroup.value.id?cf.translate('Create Server'):cf.translate('Edit Server')}}</h5>
+                    <button type="button" class="close" (click)="createModal.hide();" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body  pl-5 pr-5">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Server Code')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]="" formControlName="code">
+                                    <div *ngIf="formGroup.get('code').invalid && (myform.submitted||formGroup.get('code').dirty || formGroup.get('code').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Server Name')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]="" formControlName="gpu_address">
+                                    <div *ngIf="formGroup.get('gpu_address').invalid && (myform.submitted||formGroup.get('gpu_address').dirty || formGroup.get('gpu_address').touched)"  class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}} </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Location')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]="" formControlName="gpu_location">
+                                    <div *ngIf="formGroup.get('gpu_location').invalid && (myform.submitted||formGroup.get('gpu_location').dirty || formGroup.get('gpu_location').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Description')}}</label>
+                                <div class="fixInputDiv">
+                                    <textarea type="text" class="form-control" formControlName="description"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Video File Save To')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" formControlName="image_url">
+                                    <div *ngIf="formGroup.get('image_url').invalid && (myform.submitted||formGroup.get('image_url').dirty || formGroup.get('image_url').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Image File Save To')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" formControlName="video_url">
+                                    <div *ngIf="formGroup.get('video_url').invalid && (myform.submitted||formGroup.get('video_url').dirty || formGroup.get('video_url').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Media Type')}}</label>
+                                <div class="fixInputDiv col-form-label">
+                                    <div class="form-check form-check-inline mr-1">
+                                        <input type="radio" value="1" class="form-check-input" formControlName="media_type">
+                                        <label for="inlineRadio1" class="form-check-label">Video</label>
+                                    </div>
+                                    <div class="form-check form-check-inline mr-1">
+                                        <input type="radio" value="2" class="form-check-input" formControlName="media_type">
+                                        <label for="inlineRadio2" class="form-check-label">Image</label>
+                                    </div>
+                                </div>    
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Event Type')}}</label>
+                                <div class="fixInputDiv col-form-label">
+                                    <div class="form-check form-check-inline mr-1">
+                                        <input type="checkbox" [ngModelOptions]="{standalone: true}"  [(ngModel)]="event_type.one" class="form-check-input" (change)="changeEventCheck()">
+                                        <label for="inlineRadio1"  class="form-check-label">Lane_vehicle_cross</label>
+                                    </div>
+                                    <div class="form-check form-check-inline mr-1">
+                                        <input type="checkbox" [ngModelOptions]="{standalone: true}" [(ngModel)]="event_type.two" class="form-check-input" (change)="changeEventCheck()">
+                                        <label for="inlineRadio2" class="form-check-label">Zebra_vehicle_person_cross</label>
+                                    </div>
+                                </div>    
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Frame Frequency')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]="" formControlName="frame_frequency">
+                                    <div *ngIf="formGroup.get('frame_frequency').invalid && (myform.submitted||formGroup.get('frame_frequency').dirty || formGroup.get('frame_frequency').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Frame length')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]="" formControlName="max_record_frame">
+                                    <div *ngIf="formGroup.get('max_record_frame').invalid && (myform.submitted||formGroup.get('max_record_frame').dirty || formGroup.get('max_record_frame').touched)"  class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}} </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Frame width')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]="" formControlName="frame_width">
+                                    <div *ngIf="formGroup.get('frame_width').invalid && (myform.submitted||formGroup.get('frame_width').dirty || formGroup.get('frame_width').touched)"  class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}} </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Frame height')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]="" formControlName="frame_height">
+                                    <div *ngIf="formGroup.get('frame_height').invalid && (myform.submitted||formGroup.get('frame_height').dirty || formGroup.get('frame_height').touched)"  class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}} </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        (click)="createModal.hide()">{{cf.translate("Close")}}</button>
+                    <button type="submit"
+                        class="btn btn-primary">{{!formGroup.value.id?cf.translate('Create'):cf.translate('Edit')}}</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

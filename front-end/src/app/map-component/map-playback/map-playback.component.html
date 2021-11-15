@@ -1,0 +1,25 @@
+<baidu-map [options]="optionsMap" (loaded)="mapLoaded($event)">
+    <!-- location -->
+    <control type="navigation" [options]="controlOpts"></control>
+    <!-- start marker -->
+    <ng-container *ngFor="let marker of startAndEndPoint;let i = index">
+      <ng-container *ngIf="marker">
+        <canvaslayer [options]="marker.canvaslayerOptions">
+        </canvaslayer>
+      </ng-container>
+    </ng-container>
+    <!-- line -->
+    <ng-container *ngFor="let marker of lines;let i = index">
+        <ng-container *ngIf="marker">
+          <canvaslayer [options]="marker.canvaslayerOptions">
+          </canvaslayer>
+        </ng-container>
+    </ng-container>
+    <!-- marker -->
+    <ng-container *ngFor="let marker of vehicleMarker;let i = index">
+        <ng-container *ngIf="marker">
+          <canvaslayer [options]="marker.canvaslayerOptions">
+          </canvaslayer>
+        </ng-container>
+    </ng-container>
+</baidu-map>

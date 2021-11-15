@@ -1,0 +1,142 @@
+<div class="mat-table-content-one">
+    <mat-form-field>
+      <mat-label>{{cf.translate('Search')}}</mat-label>
+      <input matInput (keyup)="applyFilter($event)" [placeholder]="cf.translate('Search')" #input>
+    </mat-form-field>
+    <div class="mat-elevation-z8 checkTable">
+      <table mat-table [dataSource]="tableList" matSort>
+        <!-- Checkbox Column -->
+        <ng-container matColumnDef="select" sticky>
+          <th mat-header-cell *matHeaderCellDef class="checkTh">
+            <mat-checkbox (change)="$event ? masterToggle() : null;onSelectionChange()"
+                          [checked]="selection.hasValue() && isAllSelected()"
+                          [indeterminate]="selection.hasValue() && !isAllSelected()"
+                          [aria-label]="checkboxLabel()">
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row" class="checkTh">
+            <mat-checkbox (click)="$event.stopPropagation()"
+                          (change)="$event ? selection.toggle(row) : null;onSelectionChange()"
+                          [checked]="selection.isSelected(row)"
+                          [aria-label]="checkboxLabel(row)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+        <ng-container *ngFor="let rows of tbCol; let i = index">
+          <ng-container [matColumnDef]="rows">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate(tbHeader[i])}} </th>
+            <td mat-cell *matCellDef="let row"> {{row[rows]}} </td>
+          </ng-container>
+        </ng-container>
+        <!-- action -->
+        <ng-container matColumnDef="Action" stickyEnd>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="stickyOperationHeader-sm"> {{cf.translate('Action')}} </th>
+          <td mat-cell *matCellDef="let row" class="stickyOperationCell-sm">
+            <div class="btnRow">
+                <div class="btn-group">
+                    <a class="btnCC badge badge-info mfs-2" (click)="showSnapModal(row)">{{cf.translate('Detail')}}</a>
+                </div>
+                <div class="btn-group">
+                    <a class="btnCC badge badge-success mfs-2" (click)="showRecordModal(row)">{{cf.translate('Record')}}</a>
+                </div>
+            </div>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+        <!-- Row shown when there is no matching data. -->
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="4">No Item</td>
+        </tr>
+      </table>
+    </div>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+</div>
+  <!-- snap modal -->
+  <div bsModal #snapmodal="bs-modal"  [config]="{backdrop: 'static',  keyboard: false}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modal" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 1050px;" role="document">
+      <div class="modal-content" *ngIf="snap_src">
+        <div class="modal-header">
+          <h5 class="modal-title" >
+            {{snap_src.group_name}}
+          </h5>
+          <button type="button" class="close" (click)="snapmodal.hide();" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body modalWidthHeight">
+             <!-- snap image -->
+                <div class="containerOfimage">
+                  <div *ngFor="let item of snap_src.child_item; let i = index;" class="imageDiv">
+                    <img [src]="item.image_url" (error)="onImgError($event)"/>
+                    <div class="infoDiv">
+                      <div class="flexRootDiv2">
+                        <div class="prependDiv2">{{cf.translate('Vehicle')}}:</div>
+                        <div class="textDiv2" [title]="item.vehicle_number">{{item.vehicle_number}}</div>
+                      </div>
+                      <div class="flexRootDiv2">
+                        <div class="prependDiv2">{{cf.translate('Type')}}:</div>
+                        <div class="textDiv2" [title]="cf.translate(getType(item.type))">{{cf.translate(getType(item.type))}}</div>
+                      </div>
+                      <div class="flexRootDiv2">
+                        <div class="prependDiv2">{{cf.translate('Address')}}:</div>
+                        <div class="textDiv2" [title]="cf.translate(item.address)">{{item.address}}</div>
+                      </div>
+                      <div class="flexRootDiv2">
+                        <div class="prependDiv2">{{cf.translate('Datetime')}}::</div>
+                        <div class="textDiv2">{{item.datetime?cf.getDateStringYYYYMMDDHHMMSS(item.datefulltime):''}}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="snapmodal.hide()">{{cf.translate("Close")}}</button>
+          <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  <!-- record modal -->
+  <div bsModal #recordmodal="bs-modal"  [config]="{backdrop: 'static',  keyboard: false}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modal" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 1050px;" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" >
+            {{record_selected?record_selected.group_name:""}}
+          </h5>
+          <button type="button" class="close" (click)="recordmodal.hide();" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body modalWidthHeight">
+          <app-report-record-content [item]="record_item"></app-report-record-content>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="recordmodal.hide()">{{cf.translate("Close")}}</button>
+          <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  <!-- warning modal -->
+  <div bsModal  #warningModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-warning" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">{{cf.translate("Are you sure?")}}</h4>
+          <button type="button" class="close" (click)="warningModal.hide(); stop()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>{{cf.translate("You won't be able to revert this!")}}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="warningModal.hide()">{{cf.translate("Close")}}</button>
+          <button type="button" class="btn btn-warning" (click)="warningModal.hide();delList()">{{cf.translate("Yes, delete this!")}}</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->

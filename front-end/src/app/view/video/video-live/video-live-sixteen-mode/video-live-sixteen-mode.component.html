@@ -1,0 +1,21 @@
+<div class="mat-elevation-z8 checkTable">
+    <table class="table table-striped" [svData]="item" #sv="svDataTable" [svRowsOnPage]="16" svSortBy="name"
+        svSortOrder="asc" style="width: 99%;">
+        <tbody>
+            <div class="video-content">
+                <div class="video-child16" *ngFor="let item of sv.data;let i=index;">
+                    <live-player id="{{'player_'+i}}" video-url="" crossorigin="anonymous" live="true" stretch="true">
+                    </live-player>
+                    {{setQuaterSource('player_'+i,item,i)}}
+                </div>
+            </div>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4">
+                    <sv-bootstrap-paginator></sv-bootstrap-paginator>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

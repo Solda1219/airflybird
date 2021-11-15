@@ -1,0 +1,14 @@
+.rootDiv{
+    display: flex;
+    font-size: 12px;
+}
+.labelH{
+    width: 100px;
+    text-align: right;
+}
+.contentH{
+    width: calc(100% - 100px);
+    word-break: break-all;
+    border:solid 1px darkgrey;
+    text-align: center;
+}

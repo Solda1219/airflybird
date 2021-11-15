@@ -1,0 +1,102 @@
+<div class="mat-table-content-one">
+    <mat-form-field>
+      <mat-label>{{cf.translate('Search')}}</mat-label>
+      <input matInput (keyup)="applyFilter($event)" [placeholder]="cf.translate('Search')" #input>
+    </mat-form-field>
+    <div class="mat-elevation-z8 checkTable">
+      <table mat-table [dataSource]="tableList" matSort>
+        <!-- Checkbox Column -->
+        <ng-container matColumnDef="select" sticky>
+          <th mat-header-cell *matHeaderCellDef class="checkTh">
+            <mat-checkbox (change)="$event ? masterToggle() : null;onSelectionChange()"
+                          [checked]="selection.hasValue() && isAllSelected()"
+                          [indeterminate]="selection.hasValue() && !isAllSelected()"
+                          [aria-label]="checkboxLabel()">
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row" class="checkTh">
+            <mat-checkbox (click)="$event.stopPropagation()"
+                          (change)="$event ? selection.toggle(row) : null;onSelectionChange()"
+                          [checked]="selection.isSelected(row)"
+                          [aria-label]="checkboxLabel(row)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+        <ng-container *ngFor="let rows of tbCol; let i = index">
+          <ng-container [matColumnDef]="rows">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate(tbHeader[i])}} </th>
+            <td mat-cell *matCellDef="let row" [title]="row['description']"> {{row[rows]}} </td>
+          </ng-container>
+        </ng-container>
+        <!-- action -->
+        <ng-container matColumnDef="Action" stickyEnd>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="stickyOperationHeader-sm"> {{cf.translate('Action')}} </th>
+          <td mat-cell *matCellDef="let row" class="stickyOperationCell-sm">
+            <div class="btnRow">
+                <div class="btn-group">
+                    <a class="btnCC badge badge-info mfs-2" (click)="setModal(row)">{{cf.translate('play')}}</a>
+                </div>
+                <div class="btn-group">
+                    <a class="btnCC badge badge-danger mfs-2" (click)="willDelete=row;warningModal.show()">{{cf.translate('delete')}}</a>
+                </div>
+            </div>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    
+        <!-- Row shown when there is no matching data. -->
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="4">No Item</td>
+        </tr>
+      </table>
+    </div>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+  </div>
+<!-- snapVideoModal modal -->
+<div bsModal #modal="bs-modal"  [config]="{backdrop: 'static',  keyboard: false}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content" *ngIf="modal_src">
+        <div class="modal-header">
+          <h5 class="modal-title" >
+            {{modal_src.video_name}}
+          </h5>
+          <button type="button" class="close" (click)="modal.hide();" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body modalWidthHeight"> 
+          <div class="videoDiv">
+            <video controls  #video [src]="modal_src.video_url" class="videoPlayer">
+                <source type="video/mp4" />
+                Browser not supported
+            </video>
+        </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="modal.hide(); stop()">Close</button>
+          <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+   <!-- warning modal -->
+   <div bsModal  #warningModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-warning" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">{{cf.translate("Are you sure?")}}</h4>
+          <button type="button" class="close" (click)="warningModal.hide(); stop()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>{{cf.translate("You won't be able to revert this!")}}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="warningModal.hide()">{{cf.translate("Close")}}</button>
+          <button type="button" class="btn btn-warning" (click)="warningModal.hide();delList()">{{cf.translate("Yes, delete this!")}}</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->

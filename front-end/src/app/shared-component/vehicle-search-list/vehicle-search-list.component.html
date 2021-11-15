@@ -1,0 +1,52 @@
+<div class="form-group" style="margin-bottom:5px">
+  <input type="text" class="form-control" [(ngModel)]="param.search" [placeholder]="cf.translate('IMEI/DeviceName')"
+    (change)="setList()" (keyup)="onSearchKeyPress()">
+</div>
+<div class="buttonDiv">
+  <button type="button" [class]="param.status=='All'?button.active:button.inactive"
+    (click)="onStatusChange('All')">All</button>
+  <button type="button" [class]="param.status=='Online'?button.active:button.inactive"
+    (click)="onStatusChange('Online')">Online</button>
+  <button type="button" [class]="param.status=='offline'?button.active:button.inactive"
+    (click)="onStatusChange('Offline')">Offline</button>
+</div>
+<section class="list-content">
+  <div class="rootcheck">
+    <mat-checkbox class="form-check form-check-inline" [checked]="checkAll" [color]="'primary'"
+      [indeterminate]="someChecked()" (change)="setAll($event.checked)">
+      All
+    </mat-checkbox>
+  </div>
+  <div class="childcheck">
+    <ul class="p-1">
+      <li *ngFor="let item of list" class="p-1">
+        <div class="flexDivRoot">
+          <div class="p-1" style="width: 10%; padding-top: 12px !important;">
+            <mat-checkbox [(ngModel)]="item._checked" [color]="'primary'" (ngModelChange)="onCheckChange()">
+            </mat-checkbox>
+          </div>
+          <div [class]="item.vehicle_status!='offline'?'icon-div-active':'icon-div-inactive'"
+          (click)="showItemStatus(item)" style="cursor: pointer;"
+          >
+            <i class="fa fa-car"></i>
+          </div>
+          <div class="p-1" (click)="showItemStatus(item)" style="width: 70%;cursor: pointer;">
+            {{item.license_plate_number}}
+          </div>
+          <a class="p-1" [matMenuTriggerFor]="menu" style="width: 10%" style="cursor: pointer;">
+            <i class="fa fa-ellipsis-v fa-lg"></i>
+          </a>
+          <mat-menu #menu="matMenu">
+            <a class="acc" mat-menu-item [routerLink]="['/monitor/mornitortracking/',item.device_imei]" target="_blank">
+              <span>{{cf.translate('playback')}}</span>
+            </a>
+            <a class="acc" mat-menu-item  [routerLink]="['/monitor/trips/',item.device_imei]" target="_blank">
+              <span>{{cf.translate('trips')}}</span>
+            </a>
+          </mat-menu>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>

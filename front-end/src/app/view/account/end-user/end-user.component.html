@@ -1,0 +1,720 @@
+<div class="nav-tile-text">{{cf.translate('End user manage')}}</div>
+<div class="content row p-3">
+
+  <div class="col-md-2">
+    <button type="button" type="button" class="btn btn-primary rigid-btn" (click)="showCreateModal()">
+      <i class="fa fa-plus fa-lg"></i>{{cf.translate('Create user')}}
+    </button>
+  </div>
+  <div class="col-md-3 col-sm-6 noPadding">
+    <select type="number" class="form-control" [(ngModel)]="param.expiration">
+      <option value="0">Expiration</option>
+      <option value="1">Expiring soon</option>
+      <option value="2">Expired</option>
+      <!-- <option value="3">Expiring soon(User)</option>
+        <option value="4">Expired(User)</option> -->
+    </select>
+  </div>
+  <div class="col-md-3 col-sm-6 noPadding">
+    <select type="number" class="form-control" [(ngModel)]="param.active">
+      <option value="3">Activate Status</option>
+      <option value="1">Activated</option>
+      <option value="0">Inactive</option>
+    </select>
+  </div>
+  <div class="col-md-4 noPadding">
+    <button type="button" class="btn btn-primary rigid-btn" (click)="search()">Search</button>
+    <button type="button" class="btn btn-outline-dark rigid-btn rigid-default" (click)="exportToExcel()">Export</button>
+  </div>
+</div>
+<div class="mat-table-content-one p-3">
+  <mat-form-field>
+    <mat-label>{{cf.translate('Search')}}</mat-label>
+    <input matInput (keyup)="applyFilter($event)" [placeholder]="cf.translate('Search')" #input>
+  </mat-form-field>
+  <div class="mat-elevation-z8 checkTable">
+    <table mat-table [dataSource]="tableList" matSort>
+      <!-- Checkbox Column -->
+      <ng-container matColumnDef="select" sticky>
+        <th mat-header-cell *matHeaderCellDef class="checkTh">
+          <mat-checkbox (change)="$event ? masterToggle() : null;onSelectionChange()"
+            [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row" class="checkTh">
+          <mat-checkbox (click)="$event.stopPropagation()"
+            (change)="$event ? selection.toggle(row) : null;onSelectionChange()" [checked]="selection.isSelected(row)"
+            [aria-label]="checkboxLabel(row)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
+      <ng-container [matColumnDef]="'No'">
+        <th class="NoTh" mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate('No')}} </th>
+        <td class="NoTd" mat-cell *matCellDef="let row; let i = index">
+          {{ (paginator.pageIndex * paginator.pageSize) + (i + 1)}}
+        </td>
+      </ng-container>
+      <ng-container *ngFor="let rows of tbCol; let i = index">
+        <ng-container *ngIf="specialCol.indexOf(rows)==-1" [matColumnDef]="rows">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate(tbHeader[i])}} </th>
+          <td mat-cell *matCellDef="let row"> {{row[rows]}} </td>
+        </ng-container>
+        <ng-container *ngIf="rows=='created_at'" [matColumnDef]="rows">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate(tbHeader[i])}} </th>
+          <td mat-cell *matCellDef="let row"> {{cf.getDateStringYYYYMMDDHHMMSS(row[rows])}} </td>
+        </ng-container>
+      </ng-container>
+      <!-- action -->
+      <ng-container matColumnDef="Action" stickyEnd>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="stickyOperationHeader-sm">
+          {{cf.translate('Action')}} </th>
+        <td mat-cell *matCellDef="let row" class="stickyOperationCell-sm" style="width: 258px;">
+          <div class="btnRow">
+            <div class="btn-group">
+              <label class="switch switch-label switch-primary m-0">
+                <input type="checkbox" [checked]="row['state']==1" class="switch-input" (change)="status(row)">
+                <span data-checked="On" data-unchecked="Off" class="switch-slider"></span>
+              </label>
+            </div>
+            <div class="btn-group">
+              <button type="button" class="btn btn-outline-danger" (click)="willdelete=row;warningModal.show()"><i
+                  class="fa fa-remove fa-lg"></i></button>
+            </div>
+            <div class="btn-group">
+              <button type="button" class="btn btn-outline-primary" (click)="showEditModal(row)"><i
+                  class="fa fa-edit fa-lg"></i></button>
+            </div>
+            <div class="btn-group">
+              <button type="button" class="btn btn-outline-warning" (click)="resetPassword(row)"><i
+                  class="fa fa-key fa-lg"></i></button>
+            </div>
+            <div class="btn-group">
+              <button [matMenuTriggerFor]="menu" class="btn btn-outline-dark">
+                <i class="fa fa-ellipsis-v fa-lg"></i>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="showResetTermModal(row)">
+                  <span>{{cf.translate("term of valid reset")}}</span>
+                </button>
+              </mat-menu>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      <!-- Row shown when there is no matching data. -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="4">No Item</td>
+      </tr>
+    </table>
+  </div>
+  <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+</div>
+<!-- loading -->
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+
+
+
+
+
+
+
+
+
+
+<!--creation modal -->
+<div bsModal [config]="{backdrop: 'static',  keyboard: false}" #createModal="bs-modal" class="modal fade p-3"
+  tabindex="-1" role="dialog" aria-labelledby="streamModal" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <form #myform="ngForm" [formGroup]="formGroup"
+        (submit)="(formGroup.value['id']?edit():create())">
+        <div class="modal-header">
+          <h5 class="modal-title">{{!formGroup.value.id?cf.translate('Create user'):cf.translate('Edit user')}}</h5>
+          <button type="button" class="close" (click)="createModal.hide();" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <tabset [ngClass]="'noBorder'">
+            <tab [heading]="cf.translate('Basic Information')">
+              <div class="row">
+                <div class="col-md-6 col-sm-12">
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Real Name')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="text" class="form-control" [placeholder]="" formControlName="real_name">
+                      <div
+                        *ngIf="formGroup.get('real_name').invalid && (myform.submitted||formGroup.get('real_name').dirty || formGroup.get('real_name').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Vehicle Type')}}</label>
+                    <div class="fixInputDiv">
+                      <select type="text" class="form-control" formControlName="vehicle_type_id">
+                        <option *ngFor="let item of typeList" [value]="item.id"
+                          [selected]="item.id==formGroup.value['vehicle_type_id']">{{item.name}}</option>
+                      </select>
+                      <div
+                        *ngIf="formGroup.get('vehicle_type_id').invalid && (myform.submitted||formGroup.get('vehicle_type_id').dirty || formGroup.get('vehicle_type_id').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Brand')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="text" class="form-control" [placeholder]="" formControlName="brand">
+                      <div
+                        *ngIf="formGroup.get('brand').invalid && (myform.submitted||formGroup.get('brand').dirty || formGroup.get('brand').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Date of production')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="date" class="form-control" [placeholder]="" formControlName="date_of_production">
+                      <div
+                        *ngIf="formGroup.get('date_of_production').invalid && (myform.submitted||formGroup.get('date_of_production').dirty || formGroup.get('date_of_production').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Purchase date')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="date" class="form-control" [placeholder]="" formControlName="purchase_date">
+                      <div
+                        *ngIf="formGroup.get('purchase_date').invalid && (myform.submitted||formGroup.get('purchase_date').dirty || formGroup.get('date_of_production').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Date of issue')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="date" class="form-control" [placeholder]="" formControlName="date_of_issue">
+                      <div
+                        *ngIf="formGroup.get('date_of_issue').invalid && (myform.submitted||formGroup.get('date_of_issue').dirty || formGroup.get('date_of_issue').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Identification Code')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="text" class="form-control" [placeholder]="" formControlName="identification_code">
+                      <div
+                        *ngIf="formGroup.get('identification_code').invalid && (myform.submitted||formGroup.get('identification_code').dirty || formGroup.get('identification_code').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Color')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="text" class="form-control" [placeholder]="" formControlName="color">
+                      <div
+                        *ngIf="formGroup.get('color').invalid && (myform.submitted||formGroup.get('color').dirty || formGroup.get('color').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('License plate number')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="text" class="form-control" [placeholder]="" formControlName="license_plate_number">
+                      <div
+                        *ngIf="formGroup.get('license_plate_number').invalid && (myform.submitted||formGroup.get('license_plate_number').dirty || formGroup.get('license_plate_number').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row" id="distpicker1" data-toggle="distpicker" data-value-type="name">
+                    <label class="fixWidthLabel">{{cf.translate('Vehicle City')}}</label>
+                    <div class="fixInputDiv" style="display: flex;">
+                      <div style="width: 50%;">
+                        <select [attr.data-province]="formGroup.value['vehicle_province']" class="form-control" formControlName="vehicle_province">
+                        </select>
+                        <div
+                          *ngIf="formGroup.get('vehicle_province').invalid && (myform.submitted||formGroup.get('vehicle_province').dirty || formGroup.get('vehicle_province').touched)"
+                          class="invalid-feedback" style="display: block;">
+                          {{cf.translate('This field is required.')}}
+                        </div>
+                      </div>
+                      <div style="width: 50%;">
+                        <select data-city="" class="form-control" formControlName="vehicle_city">
+                        </select>
+                        <div
+                          *ngIf="formGroup.get('vehicle_city').invalid && (myform.submitted||formGroup.get('vehicle_city').dirty || formGroup.get('vehicle_city').touched)"
+                          class="invalid-feedback" style="display: block;">
+                          {{cf.translate('This field is required.')}}
+                        </div>
+                      </div>
+                     
+                    </div>
+                 
+                  </div>
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Model')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="text" class="form-control" [placeholder]="" formControlName="model">
+                      <div
+                        *ngIf="formGroup.get('model').invalid && (myform.submitted||formGroup.get('model').dirty || formGroup.get('model').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <div class="col-md-12">
+                      <div class="dropzone-one">
+                        <div class="dropzone-imagediv">
+                          <img *ngIf="driving_src" #preview_driving [src]="driving_src">
+                          <img *ngIf="!driving_src" #preview_driving [src]="formGroup.value['driving_license']">
+                        </div>
+                      </div>
+                      <input type="file" class="form-control" id = "driveFile" [placeholder]="" (change)="setFile($event,'driving')">
+                      <div
+                        *ngIf="formGroup.get('driving_license').invalid && (myform.submitted||formGroup.get('driving_license').dirty || formGroup.get('driving_license').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                    <label class="col-md-12 text-center">{{cf.translate('Driving license')}}</label>
+                  </div>
+                </div>
+              </div>
+            </tab>
+            <tab [heading]="cf.translate('Account Info')">
+              <div class="row">
+                <div class="col-md-7 col-sm-12">
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Login account')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="text" class="form-control" [placeholder]="" formControlName="phone">
+                      <div
+                        *ngIf="formGroup.get('phone').invalid && (myform.submitted||formGroup.get('phone').dirty || formGroup.get('phone').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Nick name')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="text" class="form-control" [placeholder]="" formControlName="nick_name">
+                      <div
+                        *ngIf="formGroup.get('nick_name').invalid && (myform.submitted||formGroup.get('nick_name').dirty || formGroup.get('nick_name').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="!this.formGroup.value['id']" class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Password')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="text" class="form-control" [placeholder]="" formControlName="password">
+                      <div
+                        *ngIf="formGroup.get('password').invalid && (myform.submitted||formGroup.get('password').dirty || formGroup.get('password').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Agent of vehicle')}}</label>
+                    <div class="fixInputDiv">
+                      <select type="text" class="form-control" formControlName="agent_id">
+                        <option *ngFor="let item of agentList" [value]="item.id">{{item.agent_name}}</option>
+                      </select>
+                      <div
+                        *ngIf="formGroup.get('agent_id').invalid && (myform.submitted||formGroup.get('agent_id').dirty || formGroup.get('agent_id').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Term of validity')}}</label>
+                    <div class="fixInputDiv" style="display: flex;">
+                      <div style="width: 50%;">
+                        <input type="date" class="form-control" [placeholder]="" formControlName="start">
+                        <div
+                          *ngIf="formGroup.get('start').invalid && (myform.submitted||formGroup.get('start').dirty || formGroup.get('start').touched)"
+                          class="invalid-feedback" style="display: block;">
+                          {{cf.translate('This field is required.')}}
+                        </div>
+                      </div>
+                      <div style="width: 50%;">
+                        <input type="date" class="form-control" [placeholder]="" formControlName="end">
+                        <div
+                          *ngIf="formGroup.get('end').invalid && (myform.submitted||formGroup.get('end').dirty || formGroup.get('end').touched)"
+                          class="invalid-feedback" style="display: block;">
+                          {{cf.translate('This field is required.')}}
+                        </div>
+                      </div>
+                    </div>               
+                  </div>
+                </div>
+                <div class="col-md-5 col-sm-12">
+                  <div class="form-group row">
+                    <div class="col-md-12">
+                      <div class="dropzone-one">
+                        <div class="dropzone-imagediv">
+                          <img *ngIf="avatar_src" #preview_avatar [src]="avatar_src" style="width: 100%;">
+                          <img *ngIf="!avatar_src" #preview_avatar [src]="formGroup.value['avatar']" style="width: 100%;">
+                        </div>
+                      </div>
+                      <input type="file" class="form-control" id="avatarFile" [placeholder]="" (change)="setFile($event,'avatar')">
+                      <div
+                        *ngIf="formGroup.get('avatar').invalid && (myform.submitted||formGroup.get('avatar').dirty || formGroup.get('avatar').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                    <label class="col-md-12 text-center">{{cf.translate('Agent photo')}}</label>
+                  </div>
+                </div>
+              </div>
+            </tab>
+            <tab [heading]="cf.translate('Camera Setting')">
+              <alert *ngIf="cameraList.length==0" type="danger">
+                <strong>Oh snap!</strong> Remain Camera not exist. Please create new or do something.
+              </alert>
+              <div class="row">
+                <div class="col-md-6 col-sm-12">
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Camera id')}}</label>
+                    <div class="fixInputDiv">
+                      <select type="text" class="form-control" formControlName="camera_index" (change)="camera_setting()">
+                        <option *ngIf="selectedUser&&selectedUser.camera_index" [value]="selectedUser.camera_index">{{selectedUser.camera_id}}</option>
+                        <option *ngFor="let item of cameraList" [value]="item.id">{{item.camera_id}}</option>
+                      </select>
+                      <div
+                        *ngIf="formGroup.get('camera_index').invalid && (myform.submitted||formGroup.get('camera_index').dirty || formGroup.get('camera_index').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Install Date')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="date" class="form-control" [placeholder]="" formControlName="install_date">
+                      <div
+                        *ngIf="formGroup.get('install_date').invalid && (myform.submitted||formGroup.get('install_date').dirty || formGroup.get('install_date').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('SIM Card Number')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="text" class="form-control" [placeholder]="" formControlName="sim_card_number">
+                      <div
+                        *ngIf="formGroup.get('sim_card_number').invalid && (myform.submitted||formGroup.get('sim_card_number').dirty || formGroup.get('sim_card_number').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Camera Type')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="text" class="form-control" [placeholder]="" formControlName="camera_type" readonly>
+                      <div
+                        *ngIf="formGroup.get('camera_type').invalid && (myform.submitted||formGroup.get('camera_type').dirty || formGroup.get('camera_type').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Installation Site')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="text" class="form-control" [placeholder]="" formControlName="installation_site">
+                      <div
+                        *ngIf="formGroup.get('installation_site').invalid && (myform.submitted||formGroup.get('installation_site').dirty || formGroup.get('installation_site').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Term of valid')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="date" class="form-control" [placeholder]="" formControlName="camera_end">
+                      <div
+                        *ngIf="formGroup.get('install_date').invalid && (myform.submitted||formGroup.get('install_date').dirty || formGroup.get('install_date').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 col-sm-12">
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Left Position')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="number" class="form-control" [placeholder]="" formControlName="left_position">
+                      <div
+                        *ngIf="formGroup.get('left_position').invalid && (myform.submitted||formGroup.get('left_position').dirty || formGroup.get('left_position').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('GPU')}}</label>
+                    <div class="fixInputDiv">
+                      <select type="text" class="form-control" formControlName="gpu_id">
+                        <option *ngFor="let item of gpuList" [value]="item.id">{{item.gpu_address}}</option>
+                      </select>
+                      <div
+                        *ngIf="formGroup.get('gpu_id').invalid && (myform.submitted||formGroup.get('gpu_id').dirty || formGroup.get('gpu_id').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Current Status')}}</label>
+                    <div class="fixInputDiv" style="display: flex;">
+                      <div style="width: 50%;">
+                        <select type="text" class="form-control" formControlName="status">
+                          <option value="0">off</option>
+                          <option value="1">on</option>
+                        </select>
+                        <div
+                          *ngIf="formGroup.get('status').invalid && (myform.submitted||formGroup.get('status').dirty || formGroup.get('status').touched)"
+                          class="invalid-feedback" style="display: block;">
+                          {{cf.translate('This field is required.')}}
+                        </div>
+                      </div>
+                      <div class="pr-2 pl-2" style="width: 50%;" *ngIf="formGroup.value['camera_index']">
+                        <button type="button" type="button" class="btn btn-primary rigid-btn" (click)="showGpsModal(formGroup.value['camera_index'])" style="width: 100%;">
+                          {{cf.translate('Test')}}
+                        </button>
+                      </div>
+                    </div>  
+                  </div>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                  <div class="form-group row">
+                    <label class="fixWidthLabel">{{cf.translate('Right Position')}}</label>
+                    <div class="fixInputDiv">
+                      <input type="number" class="form-control" [placeholder]="" formControlName="right_position">
+                      <div
+                        *ngIf="formGroup.get('right_position').invalid && (myform.submitted||formGroup.get('right_position').dirty || formGroup.get('right_position').touched)"
+                        class="invalid-feedback" style="display: block;">
+                        {{cf.translate('This field is required.')}}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </tab>
+          </tabset>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary"
+            (click)="createModal.hide()">{{cf.translate("Close")}}</button>
+          <button type="submit"
+            class="btn btn-primary">{{!formGroup.value.id?cf.translate('Create user'):cf.translate('Edit user')}}</button>
+        </div>
+      </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- warning modal -->
+<div bsModal #warningModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-warning" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">{{cf.translate('Are you sure?')}}</h4>
+        <button type="button" class="close" (click)="warningModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>{{cf.translate("You won't be able to revert this!")}}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="warningModal.hide()">{{cf.translate("Close")}}</button>
+        <button type="button" class="btn btn-warning"
+          (click)="warningModal.hide();del()">{{cf.translate("Yes, delete this!")}}</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- reset modal -->
+<div bsModal #resetModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-success" role="document">
+    <div class="modal-content" *ngIf="selectedUser">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          {{cf.translate('term of valid reset')}}-{{selectedUser?selectedUser.license_plate_number:''}}</h5>
+        <button type="button" class="close" (click)="resetModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group row">
+          <label class="col-md-2 fixWidthLabel">{{cf.translate('start')}}</label>
+          <div class="col-md-10">
+            <input type="date" class="form-control" [(ngModel)]="selectedUser.start">
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-2 fixWidthLabel">{{cf.translate('term')}}</label>
+          <div class="col-md-10">
+            <input type="date" class="form-control" [(ngModel)]="selectedUser.end">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="resetModal.hide()">{{cf.translate("Close")}}</button>
+        <button type="button" class="btn btn-warning"
+          (click)="warningModal.hide();resetTerm()">{{cf.translate("Save")}}</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!--modal of monitor -->
+<div bsModal [config]="{backdrop: 'static',  keyboard: false}" #GPSmodal="bs-modal" class="modal fade p-3" tabindex="-1"
+  role="dialog" aria-labelledby="streamModal" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{cf.translate("Device Status")}}</h5>
+          <button type="button" class="close" (click)="GPSmodal.hide();" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="p-3">
+            <div class="pb-1 text-bold">
+              <h5>{{cf.translate("Heartbeat Info")}}</h5>
+            </div>
+            <div class="row">
+              <div class="form-group col-md-3 row m-0 mb-2">
+                <label class="col-form-label fixWidth">{{cf.translate('fortifyStatus')}}</label>
+                <div class="outlineDiv">
+                  {{heartbeat?heartbeat.fortifyStatus:''}}
+                </div>
+              </div>
+              <div class="form-group col-md-3 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('GsmRssi')}}</label>
+                <div class="outlineDiv">
+                  {{heartbeat?heartbeat.gsmRssi:''}}
+                </div>
+              </div>
+              <div class="form-group col-md-3 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('powerLevel')}}</label>
+                <div class="outlineDiv">
+                  {{heartbeat?heartbeat.powerLevel:''}}
+                </div>
+              </div>
+              <div class="form-group col-md-3 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('powerStatus')}}</label>
+                <div class="outlineDiv">
+                  {{heartbeat?heartbeat.powerStatus:''}}
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-md-3 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('gpsStatus')}}</label>
+                <div class="outlineDiv">
+                  {{heartbeat?heartbeat.gpsStatus:''}}
+                </div>
+              </div> 
+              <div class="form-group col-md-3 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('accStatus')}}</label>
+                <div class="outlineDiv">
+                  {{heartbeat?heartbeat.accStatus:''}}
+                </div>
+              </div>
+              <div class="form-group col-md-6 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('time')}}</label>
+                <div class="outlineDiv">
+                  {{heartbeat?cf.getChineseTime(heartbeat.time):''}}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="p-3">
+            <div class="pb-1 text-bold">
+              <h5>{{cf.translate("Location Info")}}</h5>
+            </div>
+            <div class="row">
+              <div class="form-group col-md-4 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('lat')}}</label>
+                <div class="outlineDiv">
+                  {{gpsInfo?gpsInfo.lat:''}}
+                </div>
+              </div> 
+              <div class="form-group col-md-4 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('lng')}}</label>
+                <div class="outlineDiv">
+                  {{gpsInfo?gpsInfo.lng:''}}
+                </div>
+              </div> 
+              <div class="form-group col-md-4 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('Speed(km/h)')}}</label>
+                <div class="outlineDiv">
+                  {{gpsInfo?gpsInfo.gpsSpeed:''}}
+                </div>
+              </div> 
+            </div>
+            <div class="row">
+              <div class="form-group col-md-12 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('Address')}}</label>
+                <div class="outlineDiv">
+                  {{gpsInfo?gpsInfo.address:''}}
+                </div>
+              </div> 
+            </div>  
+            <div class="row">  
+              <div class="form-group col-md-6 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('time')}}</label>
+                <div class="outlineDiv">
+                  {{gpsInfo?cf.getChineseTime(gpsInfo.gpsTime):''}}
+                </div>
+              </div> 
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary"
+            (click)="GPSmodal.hide()">{{cf.translate("Close")}}</button>
+        </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

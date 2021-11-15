@@ -1,0 +1,6 @@
+<div class="form-group">
+  <ngx-treeview [ngClass]="'treeViewOne'"  [config]="config" [items]="items" (filterChange)="onFilterChange($event)"
+    (selectedChange)="onSelectChange($event)">
+  </ngx-treeview>
+</div>
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>

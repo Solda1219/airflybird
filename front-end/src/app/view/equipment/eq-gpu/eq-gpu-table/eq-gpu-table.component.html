@@ -1,0 +1,190 @@
+<div class="mat-table-content-one">
+    <mat-form-field>
+        <mat-label>{{cf.translate('Search')}}</mat-label>
+        <input matInput (keyup)="applyFilter($event)" [placeholder]="cf.translate('Search')" #input>
+    </mat-form-field>
+    <div class="mat-elevation-z8 checkTable">
+        <table mat-table [dataSource]="tableList" matSort>
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select" sticky>
+                <th mat-header-cell *matHeaderCellDef class="checkTh">
+                    <mat-checkbox (change)="$event ? masterToggle() : null;onSelectionChange()"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
+                    </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row" class="checkTh">
+                    <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null;onSelectionChange()"
+                        [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)">
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+            <ng-container [matColumnDef]="'No'" sticky>
+                <th class="NoTh" mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate('No')}} </th>
+                <td class="NoTd" mat-cell *matCellDef="let row; let i = index">
+                    {{ (paginator.pageIndex * paginator.pageSize) + (i + 1)}}
+                </td>
+            </ng-container>
+            <ng-container *ngFor="let rows of tbCol; let i = index">
+                <ng-container *ngIf="specialCol.indexOf(rows)==-1" [matColumnDef]="rows">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate(tbHeader[i])}} </th>
+                  <td mat-cell *matCellDef="let row"> {{row[rows]}} </td>
+                </ng-container>
+                <ng-container *ngIf="rows=='status'" [matColumnDef]="rows">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate(tbHeader[i])}} </th>
+                    <td mat-cell *matCellDef="let row"> 
+                        <span *ngIf="row[rows]==1" class="badge badge-pill badge-success">{{cf.translate('Running')}}</span>
+                        <span *ngIf="row[rows]==0" class="badge badge-pill badge-danger">{{cf.translate('Stop')}}</span>
+                    </td>
+                </ng-container>
+                <ng-container *ngIf="rows=='video_name'" [matColumnDef]="rows">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate(tbHeader[i])}} </th>
+                    <td mat-cell *matCellDef="let row"> 
+                        <ng-container *ngIf="row[rows]!=0">{{row[rows]}}</ng-container>
+                        <span *ngIf="row[rows]==0" class="badge badge-pill badge-danger">{{cf.translate('None')}}</span>
+                    </td>
+                </ng-container>
+                <ng-container *ngIf="rows=='detect_start'" [matColumnDef]="rows">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate(tbHeader[i])}} </th>
+                    <td mat-cell *matCellDef="let row"> 
+                        <ng-container *ngIf="row[rows]!=0">{{cf.getDateStringYYYYMMDDHHMMSS(row[rows])}}</ng-container>
+                        <span *ngIf="row[rows]==0" class="badge badge-pill badge-danger">{{cf.translate('None')}}</span>
+                    </td>
+                </ng-container>
+            </ng-container>
+            <!-- action -->
+            <ng-container matColumnDef="Action" stickyEnd>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="stickyOperationHeader-sm">
+                    {{cf.translate('Action')}} </th>
+                <td mat-cell *matCellDef="let row" class="stickyOperationCell-sm">
+                    <div class="btnRow" style="width: 250px;">
+                        <!-- status button -->
+                        <div class="btn-group">
+                            <label class="switch switch-label switch-primary m-0">
+                            <input type="checkbox" [checked]="row['status']==1" class="switch-input" (change)="status(row)">
+                            <span data-checked="On" data-unchecked="Off" class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-danger"
+                                (click)="showDeleteModal(row)"><i class="fa fa-remove fa-lg"></i></button>
+                        </div>
+                        <!-- edit button -->
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-primary" (click)="showEditModal(row)"><i
+                                    class="fa fa-edit fa-lg"></i></button>
+                        </div>
+                         <!-- edit button -->
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-primary" (click)="showCameraModal(row)"><i
+                                    class="fa fa-camera fa-lg"></i></button>
+                        </div>
+                        <!-- reset password -->
+                        <!-- <div class="btn-group">
+                            <button type="button" class="btn btn-outline-warning" (click)="resetPassword(row)"><i
+                                class="fa fa-key fa-lg"></i></button>
+                        </div> -->
+                        <!-- //more button -->
+                        <!-- <div class="btn-group">
+                            <button [matMenuTriggerFor]="menu" class="btn btn-outline-dark">
+                                <i class="fa fa-ellipsis-v fa-lg"></i>
+                            </button>
+                            <mat-menu #menu="matMenu">
+                                <button mat-menu-item (click)="showResetTermModal(row)">
+                                    <span>{{cf.translate("term of valid reset")}}</span>
+                                </button>
+                            </mat-menu>
+                        </div> -->
+                    </div>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+            <!-- Row shown when there is no matching data. -->
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" colspan="4">No Item</td>
+            </tr>
+        </table>
+    </div>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+</div>
+<!-- deleteModal -->
+<div bsModal #deleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-warning" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">{{cf.translate("Are you sure?")}}</h4>
+                <button type="button" class="close" (click)="deleteModal.hide()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>{{cf.translate("You won't be able to revert this!")}}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                    (click)="deleteModal.hide()">{{cf.translate("Close")}}</button>
+                <button type="button" class="btn btn-warning"
+                    (click)="deleteModal.hide();delList()">{{cf.translate("Yes, delete this!")}}</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- reset modal -->
+<div bsModal #resetModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-success" role="document">
+        <div class="modal-content" *ngIf="modalItem">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    {{cf.translate('term of valid reset')}}-{{modalItem?modalItem.camera_id:''}}</h5>
+                <button type="button" class="close" (click)="resetModal.hide()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label class="col-md-2 col-form-label">{{cf.translate('production date')}}</label>
+                    <div class="col-md-10">
+                        <input type="date" class="form-control" [(ngModel)]="modalItem.production_date">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-2 col-form-label">{{cf.translate('storage date')}}</label>
+                    <div class="col-md-10">
+                        <input type="date" class="form-control" [(ngModel)]="modalItem.storage_date">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                    (click)="resetModal.hide()">{{cf.translate("Close")}}</button>
+                <button type="button" class="btn btn-warning" (click)="resetTerm()">{{cf.translate("Save")}}</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!--userlist modal -->
+<div bsModal [config]="{backdrop: 'static',  keyboard: false}" #cameraListModal="bs-modal" class="modal fade p-3" tabindex="-1"
+  role="dialog" aria-labelledby="streamModal" aria-hidden="true">
+  <div class="modal-dialog m-0" role="document" style="max-width: none; margin-top: 5% !important;">
+    <div class="modal-content" *ngIf="modalItem">
+        <div class="modal-header">
+          <h5 class="modal-title">{{cf.translate("Cameras of this GPU")}}</h5>
+          <button type="button" class="close" (click)="cameraListModal.hide();" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <app-eq-gpu-cameralist-table [item]="cameraList"></app-eq-gpu-cameralist-table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary"
+            (click)="cameraListModal.hide()">{{cf.translate("Close")}}</button>
+        </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

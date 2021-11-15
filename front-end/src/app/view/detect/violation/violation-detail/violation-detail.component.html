@@ -1,0 +1,265 @@
+<div class="side-nav-content">
+    <div class="nav-tile-text">{{cf.translate('Violations Video List')}}</div>
+    <div class="content" style="padding:1rem">
+        <!-- table -->
+        <div class="mat-table-content-one" >
+            <mat-form-field>
+              <mat-label>Search..</mat-label>
+              <input matInput (keyup)="applyFilter($event)" placeholder="Search..." #input>
+            </mat-form-field>
+            <div class="mat-elevation-z8 checkTable">
+              <table mat-table [dataSource]="tableList" matSort>
+                <!-- Checkbox Column -->
+                <ng-container matColumnDef="select" sticky>
+                  <th mat-header-cell *matHeaderCellDef class="checkTh">
+                    <mat-checkbox (change)="$event ? masterToggle() : null"
+                                  [checked]="selection.hasValue() && isAllSelected()"
+                                  [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                  [aria-label]="checkboxLabel()">
+                    </mat-checkbox>
+                  </th>
+                  <td mat-cell *matCellDef="let row" class="checkTh">
+                    <mat-checkbox (click)="$event.stopPropagation()"
+                                  (change)="$event ? selection.toggle(row) : null"
+                                  [checked]="selection.isSelected(row)"
+                                  [aria-label]="checkboxLabel(row)">
+                    </mat-checkbox>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="radio" sticky>
+                  <th mat-header-cell *matHeaderCellDef class="checkTh">
+                   -
+                  </th>
+                  <td mat-cell *matCellDef="let row" class="checkTh">
+                    <mat-radio-button [checked]='isRadioSelected(row)' (click)="setDetail(row)"></mat-radio-button>
+                  </td>
+                </ng-container>
+                <ng-container *ngFor="let rows of tbCol; let i = index">
+                  <ng-container [matColumnDef]="rows">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate(tbHeader[i])}} </th>
+                    <td mat-cell *matCellDef="let row"> {{row[rows]}} </td>
+                  </ng-container>
+                </ng-container>
+                <ng-container [matColumnDef]="'checked_status'">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate("Checked Status")}} </th>
+                  <td mat-cell *matCellDef="let row"> 
+                      <span *ngIf="row['checked_status']=='finished'" class="badge badge-pill badge-success">{{row['checked_status']}}</span>
+                      <span *ngIf="row['checked_status']=='part finished'" class="badge badge-pill badge-warning">{{row['checked_status']}}</span>
+                      <span *ngIf="row['checked_status']=='Unchecked'" class="badge badge-pill badge-danger">{{row['checked_status']}}</span>
+                  </td>
+                </ng-container>
+                <!-- action -->
+                <ng-container matColumnDef="Action" stickyEnd>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header class="stickyOperationHeader"> {{cf.translate('Action')}} </th>
+                  <td mat-cell *matCellDef="let row" class="stickyOperationCell">
+                    <div class="btnRow">
+                      <!-- <div class="btn-group">
+                        <a class="btnCC badge badge-danger mfs-2">edit</a>
+                      </div> -->
+                      <div class="btn-group">
+                        <button  [class]="isRadioSelected(row)?'btnCC badge badge-danger mfs-2':'btnCC badge badge-primary mfs-2'" (click)="deleteDetail()" [disabled]="!isRadioSelected(row)">delete</button>
+                      </div>
+                      <div class="btn-group">
+                        <button [class]="isRadioSelected(row)?'btnCC badge badge-info mfs-2':'btnCC badge badge-primary mfs-2'"  (click)="saveVideoDetail()" [disabled]="!isRadioSelected(row)">save</button>
+                      </div>
+                      <div class="btn-group">
+                        <button [class]="isRadioSelected(row)?'btnCC badge badge-warning mfs-2':'btnCC badge badge-primary mfs-2'"  (click)="downLoadVideoDetail()" [disabled]="!isRadioSelected(row)">download</button>
+                      </div>
+                    </div>
+                  </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            
+                <!-- Row shown when there is no matching data. -->
+                <tr class="mat-row" *matNoDataRow>
+                  <td class="mat-cell" colspan="4">No Item</td>
+                </tr>
+              </table>
+            </div>
+            <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+            <!-- loading -->
+            <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+        </div>
+        <!-- detail -->
+        <div *ngIf="detail" class="ms-panel-header">
+          <h6>{{cf.translate('Detail info')}}</h6>
+        </div>
+        <div *ngIf="detail" class="row" style="margin: 0px;">
+          <div class="col-md-7" style="padding-left: 40px;">
+            <div class="flexRootDiv1">
+              <div class="prependDiv1">{{cf.translate('Agent')}}:</div>
+              <div class="textDiv1">{{detail.agent_name}}</div>
+            </div>
+            <div class="flexRootDiv1">
+              <div class="prependDiv1">{{cf.translate('Vehicle')}}:</div>
+              <div class="textDiv1">{{detail.carNumber}}</div>
+            </div>
+            <div class="flexRootDiv1">
+              <div class="prependDiv1">{{cf.translate('Video')}}:</div>
+              <div class="textDiv1">{{detail.video_name}}</div>
+            </div>
+            <div class="flexRootDiv1">
+              <div class="prependDiv1">{{cf.translate('Recording Time')}}(s):</div>
+              <div class="textDiv1">{{detail.dur}}</div>
+            </div>
+          </div>
+          <div class="col-md-5" style="padding:10px;">
+            <div class="videoDiv">
+              <video controls #videoPlayer class="videoPlayer">
+                <source *ngIf="detail" [src]="detail.video_src" type="video/mp4" />
+                Browser not supported
+              </video>
+            </div>
+          </div>
+        </div>
+        <!-- imageList -->
+        <div *ngIf="detail" class="ms-panel-header" style="display: flex;">
+          <mat-checkbox (change)="$event ? masterToggle1() : null"
+          [checked]="selection1.hasValue() && isAllSelected1()"
+          [indeterminate]="selection1.hasValue() && !isAllSelected1()"
+          [aria-label]="checkboxLabel1()">
+          </mat-checkbox>
+          <h6>{{cf.translate('Violation Image')}}</h6>
+        </div>
+        <div *ngIf="detail" class="row" style="margin: 0px;">
+          <div *ngFor="let item of detail.detected; let i = index;" class="col-md-4 imageDiv">
+            <mat-checkbox (click)="$event.stopPropagation()"
+            (change)="$event ? selection1.toggle(item) : null"
+            [checked]="selection1.isSelected(item)"
+            [aria-label]="checkboxLabel1(item)">
+            </mat-checkbox>
+            <a (click)="showModal(item)">
+              <img [src]="VDMSURL+'detection_img/'+detail.id+'/'+item.frame_time+'_o.jpg'" />
+            </a>
+            <div class="flexRootDiv2">
+              <div class="prependDiv2">{{cf.translate('Violation Vehicle')}}:</div>
+              <div class="textDiv2">{{item.vehicle_number}}</div>
+            </div>
+            <div class="flexRootDiv2">
+              <div class="prependDiv2">{{cf.translate('Violation type')}}:</div>
+              <div class="textDiv2">{{cf.translate(detail.violation_types[item.type-1].type)}}</div>
+            </div>
+            <div class="flexRootDiv2">
+              <div class="prependDiv2">{{cf.translate('Violation address')}}:</div>
+              <div class="textDiv2">{{item.address}}</div>
+            </div>
+            <div class="flexRootDiv2">
+              <div class="prependDiv2">{{cf.translate('Violation datetime')}}::</div>
+              <div class="textDiv2">{{item.datetime}}</div>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+<!-- modal -->
+<div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="streamModal" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content" *ngIf="modal_src">
+      <div class="modal-header">
+        <h4 class="modal-title">{{cf.translate('Frame Detail')}}</h4>
+        <button type="button" class="close" (click)="modal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body modalWidthHeight"> 
+        <div class="row">
+          <div class="col-xl-7 col-md-6 col-sm-12">
+            <ng-container *ngIf="modal_img && modal_img !='Error'">
+              <div class="imageCropperDiv">
+                <image-cropper [imageURL]="modal_img" [maintainAspectRatio]="true"
+                  [containWithinAspectRatio]="containWithinAspectRatio" [aspectRatio]="16 / 9"
+                  [resizeToWidth]="256" [cropperMinWidth]="128" [onlyScaleDown]="true" [roundCropper]="false"
+                  [canvasRotation]="canvasRotation" [transform]="transform" [alignImage]="'left'"
+                  [style.display]="showCropper ? null : 'none'" format="png"
+                  (imageCropped)="imageCropped($event)" (imageLoaded)="imageLoaded()"
+                          (cropperReady)="cropperReady($event)" (loadImageFailed)="loadImageFailed()"
+                >
+                </image-cropper>
+              </div>
+              <div class="slider_div">
+                <mat-slider [(value)]="slider_value" (valueChange)="zoomWithSlider()" [min]='0' [max]='15' [step]='1'></mat-slider>  
+              </div>
+              <!-- <img [src]="croppedImage" [style.border]="croppedImage ? '1px solid black' : 'none'" /> -->
+            </ng-container>
+            <ng-container *ngIf="!modal_img">
+              Loading...
+            </ng-container>
+            <ng-container *ngIf="modal_img && modal_img=='Error'">
+              Image is not exist.
+            </ng-container>
+          </div>
+          <div class="col-xl-5 col-md-6 col-sm-12">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text datePrependText">
+                  <p style="width: 100%; text-align: right;">{{cf.translate('FrameID')}}:</p>
+                </div>
+              </div>
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="modal_src.frame_id" readonly>
+            </div>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text datePrependText">
+                  <p style="width: 100%; text-align: right;">{{cf.translate('DateTime')}}:</p>
+                </div>
+              </div>
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="modal_src.datetime">
+            </div>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text datePrependText">
+                  <p style="width: 100%; text-align: right;">{{cf.translate('Longtitude')}}:</p>
+                </div>
+              </div>
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="modal_src.lng">
+            </div>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text datePrependText">
+                  <p style="width: 100%; text-align: right;">{{cf.translate('Latitude')}}:</p>
+                </div>
+              </div>
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="modal_src.lat">
+            </div>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text datePrependText">
+                  <p style="width: 100%; text-align: right;">{{cf.translate('Address')}}:</p>
+                </div>
+              </div>
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="modal_src.address">
+            </div>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text datePrependText">
+                  <p style="width: 100%; text-align: right;">{{cf.translate('Vehicle')}}:</p>
+                </div>
+              </div>
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="modal_src.vehicle_number">
+            </div>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text datePrependText">
+                  <p style="width: 100%; text-align: right;">{{cf.translate('Type')}}:</p>
+                </div>
+              </div>
+              <select class="form-control form-control-sm" [(ngModel)]="modal_src.type">
+                <option *ngFor="let type of detail.typeAll" [value]="type.id"
+                  [selected]="type.id == modal_src.type">
+                  {{type.type}}</option>
+              </select>
+            </div>
+            <div style="text-align: right;">
+              <button type="button" class="btn btn-warning btn-sm noTop"
+                (click)="detect(modal_src)">{{cf.translate('Detect')}}</button>
+              <button type="button" class="btn btn-success btn-sm noTop"
+                (click)="saveDetectResult(modal_src)">{{cf.translate('Save')}}</button>
+              <button type="button" class="btn btn-danger btn-sm noTop" (click)="modal.hide()">{{cf.translate('Close')}}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

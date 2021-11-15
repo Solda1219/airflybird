@@ -1,0 +1,22 @@
+<div class="form-group">
+  <div class="form-group">
+      <select type="number" class="form-control" [(ngModel)] = "exp" (ngModelChange)="days = 0; onParameterChange()">
+          <option value="1">Expiring soon</option>
+          <option value="0">Expired</option>
+      </select>
+  </div>  
+  <div class="form-group">
+    <select type="number" class="form-control" [(ngModel)] = "days" (ngModelChange)="onParameterChange()">
+        <option value="0">7 days</option>
+        <option value="1">30 days</option>
+        <option value="2">60 days</option>
+        <option value="3">7~30 days</option>
+        <option value="4">30~60 days</option>
+        <option *ngIf="exp==0" value="5">>60 days</option>
+    </select>
+ </div>  
+  <ngx-treeview [ngClass]="'treeViewOne'"  [config]="config" [items]="items" (filterChange)="onFilterChange($event)"
+     (selectedChange)="onSelectChange($event)">
+  </ngx-treeview>
+</div>
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>

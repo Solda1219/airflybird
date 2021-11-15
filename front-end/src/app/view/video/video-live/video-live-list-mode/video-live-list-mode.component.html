@@ -1,0 +1,217 @@
+<div class="mat-table-content-one">
+    <mat-form-field>
+      <mat-label>{{cf.translate('Search')}}</mat-label>
+      <input matInput (keyup)="applyFilter($event)" [placeholder]="cf.translate('Search')" #input>
+    </mat-form-field>
+    <div class="mat-elevation-z8 checkTable">
+      <table mat-table [dataSource]="tableList" matSort>
+        <!-- Checkbox Column -->
+        <ng-container matColumnDef="select" sticky>
+          <th mat-header-cell *matHeaderCellDef class="checkTh">
+            <mat-checkbox (change)="$event ? masterToggle() : null"
+                          [checked]="selection.hasValue() && isAllSelected()"
+                          [indeterminate]="selection.hasValue() && !isAllSelected()"
+                          [aria-label]="checkboxLabel()">
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row" class="checkTh">
+            <mat-checkbox (click)="$event.stopPropagation()"
+                          (change)="$event ? selection.toggle(row) : null"
+                          [checked]="selection.isSelected(row)"
+                          [aria-label]="checkboxLabel(row)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+        <ng-container *ngFor="let rows of tbCol; let i = index">
+            <!-- normal -->
+          <ng-container *ngIf="switchCol.indexOf(rows)==-1" [matColumnDef]="rows">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate(tbHeader[i])}} </th>
+            <td mat-cell *matCellDef="let row"> {{row[rows]}} </td>
+          </ng-container>
+           <!-- switch column -->
+          <ng-container *ngIf="rows=='push_switch'" [matColumnDef]="'push_switch'">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate('Push switch')}} </th>
+            <td mat-cell *matCellDef="let row"> 
+                <div class="switchdiv">
+                    <label class="switch switch-label switch-pill switch-outline-primary-alt">
+                        <input type="checkbox" class="switch-input" [(ngModel)]="row.push_switch" (change)="pushSwitch(row)" [checked]="row['push_switch']">
+                        <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
+                      </label>
+                </div>
+   
+            </td>
+          </ng-container>
+          <ng-container *ngIf="rows=='push_stream'" [matColumnDef]="'push_stream'">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate('Push Stream Authentication')}} </th>
+            <td mat-cell *matCellDef="let row"> 
+                <div class="switchdiv">
+                    <label class="switch switch-label switch-pill switch-outline-primary-alt">
+                        <input type="checkbox" class="switch-input" [checked]="row['push_stream']" [(ngModel)]="row.push_stream" (change)="pushStreamAuthentication(row)">
+                        <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
+                    </label>
+                </div>
+            
+            </td>
+          </ng-container>
+          <ng-container *ngIf="rows=='share_switch'" [matColumnDef]="'share_switch'">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate('Share switch')}} </th>
+            <td mat-cell *matCellDef="let row"> 
+                <div class="switchdiv">
+                    <label class="switch switch-label switch-pill switch-outline-primary-alt">
+                        <input type="checkbox" class="switch-input" [checked]="row['share_switch']" [(ngModel)]="row.share_switch" (change)="shareSwitch(row)">
+                        <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
+                    </label>
+                    <div *ngIf="row['share_switch']">
+                      <span class="el-tag1 el-tag--mini1 el-tag--light">
+                          <a [href]="host_url+row.sharedLink" target="_blank">
+                              <i class="fa fa-share"></i>Share page
+                          </a>
+                      </span>
+                  </div>
+                </div>
+            </td>
+          </ng-container>
+        </ng-container>
+        <!-- action -->
+        <ng-container matColumnDef="Action" stickyEnd>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="stickyOperationHeader"> {{cf.translate('Action')}} </th>
+          <td mat-cell *matCellDef="let row" class="stickyOperationCell">
+            <div class="btnRow" style="text-align: center; display:inline">
+              <div class="btn-group">
+                <button [matMenuTriggerFor]="menu"  [class]="!row.session?'btnCC badge badge-warning mfs-2 disabled':'btnCC badge badge-warning mfs-2'" [disabled]="!row.session">
+                  <i class="fa fa-play fa-lg"></i>
+                  {{cf.translate('Play')}}
+                </button>
+                <mat-menu #menu="matMenu">
+                  <button mat-menu-item (click)="play(row,'HTTPFLV')">
+                    <span>HTTPFLV</span>
+                  </button>
+                  <button mat-menu-item (click)="play(row,'WSFLV')">
+                    <span>WS-FLV</span>
+                  </button>
+                  <button mat-menu-item (click)="play(row,'HLS')">
+                    <span>HLS(m3u8)</span>
+                  </button>
+                  <button mat-menu-item (click)="play(row,'RTMP')">
+                    <span>RTMP</span>
+                  </button>
+                </mat-menu>
+              </div>
+            </div>
+            <div class="btn-group">
+              <button  class="btnCC badge badge-info mfs-2" (click)="reminisce(row)"><i class="fa fa-backward fa-lg"></i>{{cf.translate('Playback')}}</button>
+            </div>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    
+        <!-- Row shown when there is no matching data. -->
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="4">No Item</td>
+        </tr>
+      </table>
+    </div>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+    <!-- loading -->
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+</div>
+
+<!-- reminisce modal -->
+<div bsModal [config]="{backdrop: 'static',  keyboard: false}" #reminisceModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="reminisceModal" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{cf.translate('Video review')}}</h5>
+        <button type="button" class="close" (click)="reminisceModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body modalWidthHeight"> 
+        <div class="accordion" id="root" *ngIf="re_src">
+          <mat-accordion class="example-headers-align" multi>
+            <ng-container *ngFor ="let month of re_src.months; let m_index = index">
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <div class="card-header">
+                    <span class="has-icon"> <i class="flaticon-start"></i> {{month}}-{{re_item.id}} </span>
+                  </div>
+                </mat-expansion-panel-header>
+                <ng-container  *ngFor = "let day of re_src[month]['days']; let d_index = index">
+                  <mat-expansion-panel *ngIf = "re_src[month][day].length>0">
+                    <mat-expansion-panel-header>
+                      <div class="card-header" data-toggle="collapse" role="button">
+                          <span class="has-icon"> <i class="flaticon-start"></i> {{day}}({{re_src[month][day].length}})</span>
+                      </div>
+                    </mat-expansion-panel-header>
+                    <div class="video-content">
+                      <div class="snap-content" *ngFor="let item of re_src[month][day]">
+                          <a style="cursor: pointer;" (click)="showSnapVideo(item)">
+                              <img [src]="('/live_api/api/v1/record/getsnap?id='+re_item.id+'&period='+item.start_time)|secureLive|async">
+                              <div class="text-center snap-detail">{{cf.convertTOYYYYMMDDHHMMSS(item.start_time)}}</div>
+                          </a>
+                      </div>
+                  </div>
+                  </mat-expansion-panel>
+                </ng-container>
+               
+              </mat-expansion-panel>
+            </ng-container>
+
+          </mat-accordion>
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="reminisceModal.hide()">{{cf.translate("Close")}}</button>
+        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- snapVideoModal modal -->
+<div bsModal [config]="{backdrop: 'static',  keyboard: false}" #snapVideoModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="snapVideoModal" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" *ngIf="snap_src">
+          {{snap_src.name}}-{{cf.getDateStringYYYYMMDDHHMMSS(cf.convertTOYYYYMMDDHHMMSS(snap_src.start_time))}}
+        </h5>
+        <button type="button" class="close" (click)="snapVideoModal.hide(); stop()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body modalWidthHeight"> 
+        <div class="videoDiv">
+          <video controls  #snapPlayer class="videoPlayer">
+              <source type="video/mp4" />
+              Browser not supported
+            </video>
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="snapVideoModal.hide(); stop()">Close</button>
+        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- streamModal modal -->
+<div bsModal [config]="{backdrop: 'static',  keyboard: false}" #streamModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="streamModal" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header" *ngIf="stream_src">
+        <h4 class="modal-title">{{stream_src}}</h4>
+        <button type="button" class="close" (click)="streamModal.hide(); stop()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body modalWidthHeight"> 
+        <live-player #streamPlayer video-url="" crossorigin="anonymous" live="true" stretch="true"></live-player>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="streamModal.hide(); stop()">{{cf.translate("Close")}}</button>
+        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

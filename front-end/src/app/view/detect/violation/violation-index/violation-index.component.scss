@@ -1,0 +1,28 @@
+.autoResizeTextArea{
+    height: 35px;
+    width:97%;
+    overflow-y: hidden;
+    position: absolute;
+}
+.autoResizeTextArea:focus{
+    height: 200px;
+    overflow-y: auto;
+    z-index: 10;
+}
+.autoCT{
+    min-height: 35px;
+}
+.noPadding{
+    padding-right: 8px;
+    padding-left: 0px;
+}
+.btnRow{
+    display: flex;
+    flex-wrap: wrap;
+}
+.btnRow .btn-group{
+    padding: 0px 3px;
+}
+.btnCC{
+    cursor: pointer;
+}

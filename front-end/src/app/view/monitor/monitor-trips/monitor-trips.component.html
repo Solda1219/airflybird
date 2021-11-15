@@ -1,0 +1,91 @@
+<mat-drawer-container class="side-nav-container" autosize>
+    <mat-drawer #drawer class="side-nav-sidenav" mode="side" [opened]="true">
+        <div class="nav-tile-text-bold text-center">{{cf.translate('Setting')}}</div>
+        <span class="toggle-tree-btn">
+            <button type="button" class="btn btn-block btn-outline" (click)="drawer.toggle(); _opened = !_opened">
+                <i class="fa fa-caret-left" aria-hidden="true"></i>
+            </button>
+        </span>
+        <!-- loading -->
+        <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+        <div class="sideNavChild-full">
+          <div class="m-1 mt-3">
+            <div class="rootDiv mb-2">
+              <div class="labelH p-1">{{cf.translate('Start Address')}}:</div>
+              <div class="contentH p-1">{{status_info.start}}</div>
+            </div>
+            <div class="rootDiv mb-2">
+              <div class="labelH p-1">{{cf.translate('Current Address')}}:</div>
+              <div class="contentH p-1">{{status_info.cur}}</div>
+            </div>
+            <div class="rootDiv mb-2">
+              <div class="labelH p-1">{{cf.translate('Time')}}:</div>
+              <div class="contentH p-1">{{status_info.time?cf.getDateStringYYYYMMDDHHMMSS(status_info.time):''}}</div>
+            </div>
+            <div class="rootDiv mb-2">
+              <div class="labelH p-1">{{cf.translate('Total miles(km)')}}:</div>
+              <div class="contentH p-1">{{status_info.totalMile}}</div>
+            </div>
+            <div class="rootDiv mb-2">
+              <div class="labelH p-1">{{cf.translate('Speed')}}:</div>
+              <div class="contentH p-1">{{status_info.speed}}</div>
+            </div>
+          </div>
+          <div *ngIf="liveInfo" class="m-1 mb-2" style="border:solid 1px darkgrey">
+                <div class="rootDiv mb-2">
+                  <div class="labelH p-1">{{cf.translate('Push switch')}}:</div>
+                  <div class="contentH p-1" style="border-width:0">
+                    <div class="switchdiv">
+                      <label class="switch switch-label switch-pill switch-outline-primary-alt m-0">
+                          <input type="checkbox" class="switch-input" [checked]="liveInfo['push_switch']" [(ngModel)]="liveInfo.push_switch" (change)="pushSwitch(liveInfo)">
+                          <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="rootDiv mb-2">
+                  <div class="labelH p-1">{{cf.translate('Push Stream')}}:</div>
+                  <div class="contentH p-1" style="border-width:0">
+                    <div class="switchdiv">
+                      <label class="switch switch-label switch-pill switch-outline-primary-alt m-0">
+                          <input type="checkbox" class="switch-input" [checked]="liveInfo['push_stream']" [(ngModel)]="liveInfo.push_stream" (change)="pushStreamAuthentication(liveInfo)">
+                        <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="rootDiv mb-2">
+                  <div class="labelH p-1">{{cf.translate('Share switch')}}:</div>
+                  <div class="contentH p-1" style="border-width:0">
+                    <div class="switchdiv">
+                      <label class="switch switch-label switch-pill switch-outline-primary-alt m-0">
+                          <input type="checkbox" class="switch-input" [checked]="liveInfo['share_switch']" [(ngModel)]="liveInfo.share_switch" (change)="shareSwitch(liveInfo)">
+                        <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="rootDiv mb-2 pr-3 pl-3">
+                  <button type="button" class="btn btn-square btn-block btn-success" (click)="sendPushStream()">
+                      {{cf.translate('Send Pushstream')}}
+                  </button>
+                </div>
+          </div>
+          <div class="m-1">
+                  <live-player #streamPlayer video-url="" crossorigin="anonymous" live="true" stretch="true"></live-player>
+          </div>
+        </div>
+    </mat-drawer>
+    <div *ngIf="!_opened" class="d-md-down-none hambergerDIV">
+        <span class="toggle-tree-btn-right">
+            <button type="button" class="btn btn-block btn-outline" (click)="drawer.toggle(); _opened = !_opened">
+                <i class="fa fa-caret-right" aria-hidden="true"></i>
+            </button>
+        </span>
+    </div>
+    <div class="side-nav-content-full">
+        <div class="nav-tile-text">{{cf.translate('Trips')}}-{{vehicleInfo?vehicleInfo.license_plate_number:""}}
+        </div>
+        <app-map-trips [gpsdata]='gpsdata' [vehicleInfo]='vehicleInfo' (map_loaded)="startInterval()"></app-map-trips>
+    </div>
+</mat-drawer-container>

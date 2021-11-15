@@ -1,0 +1,42 @@
+<div class="nav-tile-text">{{cf.translate('Report of overspeed')}}</div>
+ <!-- loading -->
+ <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+ <div class="p-2">
+    <form [formGroup]="formGroup" class="form-horizontal" (submit)="search()">
+        <div class="row m-0 mb-1">
+            <div class="p-1">
+                <select class="form-control" formControlName="dateDefine" (change)="dateDefine()">
+                    <option value="0">{{cf.translate("today")}}</option>
+                    <option value="1">{{cf.translate("this week")}}</option>
+                    <option value="2">{{cf.translate("this month")}}</option>
+                    <option value="9">{{cf.translate("History")}}</option>
+                </select>
+            </div>
+            <div class="p-1">
+                <input type="date" class="form-control" formControlName="startdate">
+            </div>
+            <div class="p-1">
+                <input type="date" class="form-control" formControlName="enddate">
+            </div>
+        </div>
+        <div class="row m-0">   
+            <div *ngIf="agents.length>0" class="p-1">
+                <select type="text" class="form-control" formControlName="agent">
+                    <option value="all" selected>{{cf.translate("All")}}</option>
+                    <option *ngFor="let item of agents" [value]="item.id">{{item.agent_name}}</option>
+                </select>
+            </div>
+            <div class="p-1">
+                <textarea type="text" class="form-control autoResizeTextArea" formControlName="imei" [placeholder]="'IMEI('+cf.translate('Press Enter for multiple lines')+')'"></textarea>
+            </div>
+            <div class="p-1">
+                <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Search')}}</button>
+                <button type="button" class="btn btn-outline-dark rigid-btn rigid-default" (click)="formSet()">{{cf.translate('Reset')}}</button>
+                <button type="button" class="btn btn-outline-dark rigid-btn rigid-default" (click)="exportToExcel()">{{cf.translate('Export')}}</button>
+            </div>
+        </div>
+    </form>
+ </div>
+ <div class="p-2">
+    <app-report-overspeed-content [item]="item" (selectedItems)="selected_items = $event"></app-report-overspeed-content>
+ </div>

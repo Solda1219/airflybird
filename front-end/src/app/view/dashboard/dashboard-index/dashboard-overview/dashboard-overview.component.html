@@ -1,0 +1,196 @@
+<!-- loading -->
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+<div class="containerDiv">
+  <div class="subContainer">
+    <div class="cardDiv">
+      <div class="card text-white ratio2_1" style="background-color: #673ab7f7; border-color: #673ab7f7;">
+        <div class="card-body">
+          <div class="h1 text-muted text-right">
+            <i class="fa fa-camera"></i>
+          </div>
+          <div class="h4 mb-0">{{info.total_camera}}</div>
+          <small class="text-muted text-uppercase font-weight-bold">{{cf.translate("Total camera")}}</small>
+        </div>
+      </div>
+      <div class="card text-white ratio2_1" style="background-color: #3f51b5">
+        <div class="card-body">
+          <div class="h1 text-muted text-right">
+            <i class="fa fa-car"></i>
+          </div>
+          <div class="h4 mb-0">{{info.total_car}}</div>
+          <small class="text-muted text-uppercase font-weight-bold">{{cf.translate('Total vehicle')}}</small>
+        </div>
+      </div>
+    </div>
+    <div class="cardDiv">
+      <div class="card text-white bg-success">
+        <div class="card-body">
+          <div class="h1 text-muted text-right">
+            <i class="fa fa-bullseye"></i>
+          </div>
+          <div class="h4 mb-0">{{info.online_camera}}</div>
+          <small class="text-muted text-uppercase font-weight-bold">{{cf.translate("Online")}}</small>
+        </div>
+      </div>
+      <div class="card text-white bg-danger">
+        <div class="card-body">
+          <div class="h1 text-muted text-right ">
+            <i class="fa fa-ban"></i>
+          </div>
+          <div class="h4 mb-0">{{info.offline_camera}}</div>
+          <small class="text-muted text-uppercase font-weight-bold">{{cf.translate("Offline")}}</small>
+        </div>
+      </div>
+      <div class="card text-white bg-info">
+        <div class="card-body">
+          <div class="h1 text-muted text-right ">
+            <i class="fa fa-video-camera"></i>
+          </div>
+          <div class="h4 mb-0">{{info.total_video}}</div>
+          <small class="text-muted text-uppercase font-weight-bold">{{cf.translate('Video uploaded')}}</small>
+        </div>
+      </div>
+      <div class="card text-white bg-warning">
+        <div class="card-body">
+          <div class="h1 text-muted text-right ">
+            <i class="fa fa-file-video-o"></i>
+          </div>
+          <div class="h4 mb-0">{{info.vio_video}}</div>
+          <small class="text-muted text-uppercase font-weight-bold">{{cf.translate("Vio video")}}</small>
+        </div>
+      </div>
+    </div>
+    <div class="cardDiv">
+      <div class="card text-white bg-primary">
+        <div class="card-body">
+          <div class="h1 text-muted text-right ">
+            <i class="fa fa-clock-o"></i>
+          </div>
+          <div class="h4 mb-0">{{info.exp_car}}</div>
+          <small class="text-muted text-uppercase font-weight-bold">{{cf.translate('Expired')}}</small>
+        </div>
+      </div>
+      <div class="card text-white bg-danger">
+        <div class="card-body">
+          <div class="h1 text-muted text-right ">
+            <i class="fa fa-clock-o"></i>
+          </div>
+          <div class="h4 mb-0">{{info.exps_car}}</div>
+          <small class="text-muted text-uppercase font-weight-bold">{{cf.translate('Expiring soon')}}</small>
+        </div>
+      </div>
+      <div class="card text-white bg-info">
+        <div class="card-body">
+          <div class="h1 text-muted text-right ">
+            <i class="fa fa-check"></i>
+          </div>
+          <div class="h4 mb-0">{{info.total_reviewed}}</div>
+          <small class="text-muted text-uppercase font-weight-bold">{{cf.translate("Total reviewed")}}</small>
+        </div>
+      </div>
+      <div class="card text-white bg-danger">
+        <div class="card-body">
+          <div class="h1 text-muted text-right ">
+            <i class="fa fa-object-group"></i>
+          </div>
+          <div class="h4 mb-0">{{info.total_grouped}}</div>
+          <small class="text-muted text-uppercase font-weight-bold">{{cf.translate("Total grouped")}}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="subContainer">
+    <div class="cardDiv">
+      <div class="card text-white bg-primary ratio2_1">
+        <div class="card-body">
+          <div class="h1 text-center">
+            <i  class="cil-people routeIcon"></i>
+          </div>
+          <small class="text-uppercase font-weight-bold">Account</small>
+        </div>
+      </div>
+      <div class="card text-white bg-success ratio2_1">
+        <div class="card-body">
+          <div class="h1 text-center">
+            <i  class="cil-car-alt routeIcon"></i>
+          </div>
+          <small class="text-uppercase font-weight-bold">Device</small>
+        </div>
+      </div>
+    </div>
+    <div class="cardDiv">
+      <div class="card text-white bg-danger">
+        <div class="card-body">
+          <div class="h1 text-center">
+            <i  class="cil-monitor routeIcon"></i>
+          </div>
+          <small class="text-uppercase font-weight-bold">Monitor</small>
+        </div>
+      </div>
+      <div class="card text-white bg-warning">
+        <div class="card-body">
+          <div class="h1 text-center">
+            <i  class="cil-video routeIcon"></i>
+          </div>
+          <small class="text-uppercase font-weight-bold">Video</small>
+        </div>
+      </div>
+      <div class="card text-white bg-danger">
+        <div class="card-body">
+          <div class="h1 text-center">
+            <i  class="cil-check-circle routeIcon"></i>
+          </div>
+          <small class="text-uppercase font-weight-bold">Detect</small>
+        </div>
+      </div>
+      <div class="card text-white bg-info">
+        <div class="card-body">
+          <div class="h1 text-center">
+            <i  class="cil-camera routeIcon"></i>
+          </div>
+          <small class="text-uppercase font-weight-bold">Equipment</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="containerDivFRT">
+  <div class="subContainerFRT">
+    <div class="cardDiv">
+      <div class="text-white bg-primary" style="width: 30%; margin: 2px;">
+        <div style="display:flex; padding: 30px;">
+          <div class="h1 text-warning text-left " style="width: 50px;">
+            <i class="fa fa-user"></i>
+          </div>
+          <div>
+            <div class="h4">{{phone}}</div>
+            <div class="h6 text-muted">{{role}}</div>
+            <div class="h6 text-muted">{{nickname}}</div>
+          </div>
+        </div>
+      </div>
+      <div class="text-white bg-primary" style="width: 45%; margin: 2px;">
+        <div style="display:flex; padding: 30px;">
+          <div class="h1 text-warning text-left " style="width: 50px;">
+            <i class="fa fa-phone"></i>
+          </div>
+          <div>
+            <div class="h4">大连协同天下电子商务科技有限公司</div>
+            <div class="h6 text-muted">www.aidetecting.com</div>
+            <div class="h6  text-muted">service@imflybird.com</div>
+          </div>
+        </div>
+      </div>
+      <div class="text-white bg-primary" style="width: 25%; margin: 2px">
+        <div >
+          <div class="h1 text-center" style="margin-top: 27px;">
+            <qrcode [qrdata]="qrcode" [width]="70" [errorCorrectionLevel]="'M'" [elementType]="'svg'"></qrcode>
+          </div>
+          <div class="text-center">
+            <small class="text-uppercase font-weight-bold">Scan QR code to download App</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>      

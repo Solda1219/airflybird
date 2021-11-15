@@ -1,0 +1,182 @@
+<div class="nav-tile-text">{{cf.translate('Media server manage')}}</div>
+<div class="content row p-3">
+
+    <div class="col-md-2">
+        <button type="button" type="submit" class="btn btn-primary rigid-btn" (click)="showCreateModal()">
+            <i class="fa fa-plus fa-lg"></i>{{cf.translate('Create Server')}}
+        </button>
+    </div>
+    <!-- <div class="col-md-3 col-sm-6 noPadding">
+        <select type="number" class="form-control" [(ngModel)]="param.expire" (change)="setTableList()">
+            <option value="0">{{cf.translate('All')}}</option>
+            <option value="1">{{cf.translate('Expired')}}</option>
+            <option value="2">{{cf.translate('About to expire')}}</option>
+            <option value="3">{{cf.translate('Available')}}</option>
+        </select>
+    </div>
+    <div class="col-md-3 col-sm-6 noPadding">
+        <select type="number" class="form-control" [(ngModel)]="param.install" (change)="setTableList()">
+            <option value="0">{{cf.translate('All')}}</option>
+            <option value="1">{{cf.translate('Installed')}}</option>
+            <option value="2">{{cf.translate('Not Installed')}}</option>
+        </select>
+    </div> -->
+    <!-- <div class="col-md-4 noPadding">
+        <button type="button" class="btn btn-primary rigid-btn" (click)="search()">Search</button>
+        <button type="button" class="btn btn-outline-dark rigid-btn rigid-default"
+            (click)="exportToExcel()">Export</button>
+    </div> -->
+</div>
+<div class="p-3">
+    <app-eq-media-table [item]="tableList" (openEditModal)="showEditModal($event)" (deleteItems)="del($event)" (editItems)="editList($event)"></app-eq-media-table>
+</div>
+<!-- loading -->
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+
+<!-- modalpart -->
+<!--creation modal -->
+<div bsModal [config]="{backdrop: 'static',  keyboard: false}" #createModal="bs-modal" class="modal fade p-3"
+    tabindex="-1" role="dialog" aria-labelledby="streamModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form #myform="ngForm" *ngIf="formGroup" [formGroup]="formGroup"
+                (submit)="(formGroup.value['id']?edit():create())">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        {{!formGroup.value.id?cf.translate('Create Server'):cf.translate('Edit Server')}}</h5>
+                    <button type="button" class="close" (click)="createModal.hide();" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body  pl-5 pr-5">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Server ID')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]="" formControlName="server_id">
+                                    <div *ngIf="formGroup.get('server_id').invalid && (myform.submitted||formGroup.get('server_id').dirty || formGroup.get('server_id').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Address')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]="" formControlName="address">
+                                    <div *ngIf="formGroup.get('address').invalid && (myform.submitted||formGroup.get('address').dirty || formGroup.get('address').touched)"  class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}} </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Term Of Validity')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="date" class="form-control" [placeholder]="" formControlName="server_start">
+                                    <div *ngIf="formGroup.get('server_start').invalid && (myform.submitted||formGroup.get('server_start').dirty || formGroup.get('server_start').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('To')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="date" class="form-control" [placeholder]="" formControlName="server_end">
+                                    <div *ngIf="formGroup.get('server_end').invalid && (myform.submitted||formGroup.get('server_end').dirty || formGroup.get('server_end').touched)"  class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}} </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('IP Address')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" formControlName="ip_address">
+                                    <div *ngIf="formGroup.get('ip_address').invalid && (myform.submitted||formGroup.get('ip_address').dirty || formGroup.get('ip_address').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Domain Name')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" formControlName="domain_name">
+                                    <div *ngIf="formGroup.get('domain_name').invalid && (myform.submitted||formGroup.get('domain_name').dirty || formGroup.get('domain_name').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('User name')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" formControlName="user_name">
+                                    <div *ngIf="formGroup.get('user_name').invalid && (myform.submitted||formGroup.get('user_name').dirty || formGroup.get('user_name').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Password')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" formControlName="password">
+                                    <div *ngIf="formGroup.get('password').invalid && (myform.submitted||formGroup.get('password').dirty || formGroup.get('password').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Camera_url')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" formControlName="camera_url">
+                                    <div *ngIf="formGroup.get('camera_url').invalid && (myform.submitted||formGroup.get('camera_url').dirty || formGroup.get('camera_url').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Camera Token')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" formControlName="camera_token">
+                                    <div *ngIf="formGroup.get('camera_token').invalid && (myform.submitted||formGroup.get('camera_token').dirty || formGroup.get('camera_token').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Living URL')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" formControlName="living_url">
+                                    <div *ngIf="formGroup.get('living_url').invalid && (myform.submitted||formGroup.get('living_url').dirty || formGroup.get('living_url').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Living Token')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" formControlName="living_token">
+                                    <div *ngIf="formGroup.get('living_token').invalid && (myform.submitted||formGroup.get('living_token').dirty || formGroup.get('living_token').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        (click)="createModal.hide()">{{cf.translate("Close")}}</button>
+                    <button type="submit"
+                        class="btn btn-primary">{{!formGroup.value.id?cf.translate('Create'):cf.translate('Edit')}}</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

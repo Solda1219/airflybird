@@ -1,0 +1,628 @@
+<mat-drawer-container class="side-nav-container" autosize>
+  <mat-drawer #drawer class="side-nav-sidenav" mode="side" [opened]="true">
+    <div class="nav-tile-text-bold text-center">{{cf.translate('Device')}}</div>
+    <span class="toggle-tree-btn">
+      <button type="button" class="btn btn-block btn-outline" (click)="drawer.toggle(); _opened = !_opened">
+        <i class="fa fa-caret-left" aria-hidden="true"></i>
+      </button>
+    </span>
+    <!--Left tabs -->
+    <tabset [ngClass]="'noBorder'">
+      <tab [heading]="cf.translate('All')" (selectTab)="tabChange('All')">
+        <app-customer-list-tree *ngIf = "tab=='All'" (selectedItems)="treeViewChange($event)"></app-customer-list-tree>
+      </tab>
+      <tab [heading]="cf.translate('Expiration')" (selectTab)="tabChange('Expiration')">
+        <app-expiration-list-tree *ngIf = "tab=='Expiration'"  (selectedItems)="treeViewChange($event)"></app-expiration-list-tree>
+      </tab>
+    </tabset>
+  </mat-drawer>
+
+  <div class="side-nav-content">
+    <div class="nav-tile-text">{{cf.translate(tab)}} {{cf.translate('Device')}}</div>
+    <span class="toggle-tree-btn-right">
+      <button *ngIf="!_opened" type="button" class="btn btn-block btn-outline"
+        (click)="drawer.toggle(); _opened = !_opened">
+        <i class="fa fa-caret-right" aria-hidden="true"></i>
+      </button>
+    </span>
+    <div class="content">
+      <app-device-all *ngIf = "tab=='All'" [treeItem]="treeItem" (showGpsModal)="showGPS($event)" (showCmdModal)="showCmdModal($event)"></app-device-all>
+      <app-device-exp *ngIf = "tab=='Expiration'" [treeItem]="treeItem" (showGpsModal)="showGPS($event)"></app-device-exp>
+    </div>
+  </div>
+</mat-drawer-container>
+<!-- loading -->
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+<!--modal of monitor -->
+<div bsModal [config]="{backdrop: 'static',  keyboard: false}" #GPSmodal="bs-modal" class="modal fade p-3" tabindex="-1"
+  role="dialog" aria-labelledby="streamModal" aria-hidden="true">
+  <div class="modal-dialog m-0" role="document" style="max-width: none; margin-top: 5% !important;">
+    <div class="modal-content" style="max-width: 1000px; margin:auto">
+        <div class="modal-header">
+          <h5 class="modal-title">{{cf.translate("Device Status")}}({{selectedItem?selectedItem.device_imei:""}})</h5>
+          <button type="button" class="close" (click)="GPSmodal.hide();" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="p-3">
+            <div class="pb-1 text-bold">
+              <h5>{{cf.translate("Heartbeat Info")}}</h5>
+            </div>
+            <div class="row">
+              <div class="form-group col-md-3 row m-0 mb-2">
+                <label class="col-form-label fixWidth">{{cf.translate('fortifyStatus')}}</label>
+                <div class="outlineDiv">
+                  {{heartbeat?heartbeat.fortifyStatus:''}}
+                </div>
+              </div>
+              <div class="form-group col-md-3 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('GsmRssi')}}</label>
+                <div class="outlineDiv">
+                  {{heartbeat?heartbeat.gsmRssi:''}}
+                </div>
+              </div>
+              <div class="form-group col-md-3 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('powerLevel')}}</label>
+                <div class="outlineDiv">
+                  {{heartbeat?heartbeat.powerLevel:''}}
+                </div>
+              </div>
+              <div class="form-group col-md-3 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('powerStatus')}}</label>
+                <div class="outlineDiv">
+                  {{heartbeat?heartbeat.powerStatus==0?cf.translate('Down'):cf.translate('Open'):''}}
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-md-3 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('gpsStatus')}}</label>
+                <div class="outlineDiv">
+                  {{heartbeat?heartbeat.gpsStatus==0?cf.translate('Down'):cf.translate('Open'):''}}
+                </div>
+              </div>
+              <div class="form-group col-md-3 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('accStatus')}}</label>
+                <div class="outlineDiv">
+                  {{heartbeat?heartbeat.accStatus==0?cf.translate('Down'):cf.translate('Open'):''}}
+                </div>
+              </div>
+              <div class="form-group col-md-6 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('time')}}</label>
+                <div class="outlineDiv">
+                  {{heartbeat?heartbeat.time:''}}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="p-3">
+            <div class="pb-1 text-bold">
+              <h5>{{cf.translate("Location Info")}}</h5>
+            </div>
+            <div class="row">
+              <div class="form-group col-md-4 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('lat')}}</label>
+                <div class="outlineDiv">
+                  {{gpsInfo?gpsInfo.lat:''}}
+                </div>
+              </div>
+              <div class="form-group col-md-4 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('lng')}}</label>
+                <div class="outlineDiv">
+                  {{gpsInfo?gpsInfo.lng:''}}
+                </div>
+              </div>
+              <div class="form-group col-md-4 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('Speed(km/h)')}}</label>
+                <div class="outlineDiv">
+                  {{gpsInfo?gpsInfo.gpsSpeed:''}}
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-md-12 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('Address')}}</label>
+                <div class="outlineDiv">
+                  {{gpsInfo?gpsInfo.address:''}}
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-md-6 row m-0 mb-2">
+                <label class="fixWidth col-form-label">{{cf.translate('time')}}</label>
+                <div class="outlineDiv">
+                  {{gpsInfo?cf.getDateStringYYYYMMDDHHMMSS(gpsInfo.gpsTime):''}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary"
+            (click)="GPSmodal.hide()">{{cf.translate("Close")}}</button>
+        </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+  <!-- command modal -->
+  <div bsModal #commandmodal="bs-modal"  [config]="{backdrop: 'static',  keyboard: false}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modal" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width: 700px;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" >
+            {{cf.translate('Device command')}}
+          </h5>
+          <button type="button" class="close" (click)="commandmodal.hide();" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body modalWidthHeight">
+          <div class="flex-div">
+            <label class="col-2 p-0 text-right">{{cf.translate('Device name')}}:</label>
+            <div class="col-4">{{cmditem?cmditem.license_plate_number:''}}</div>
+            <label class="col-2 p-0 text-right">{{cf.translate('Device IMEI')}}:</label>
+            <div class="col-4">{{cmditem?cmditem.device_imei:''}}</div>
+          </div>
+          <div class="flex-div">
+            <label class="col-2 p-0 text-right">{{cf.translate('Command type')}}:</label>
+            <div class="col-4">
+              <select class="form-control form-control-sm" [(ngModel)]="cmdtype" (change)="formSet()">
+                <option [value]="0">{{cf.translate('DVR gateway service address')}}</option>
+                <option [value]="1">{{cf.translate('Upload address of the file storage')}}</option>
+                <option [value]="2">{{cf.translate('RTMP live streaming service address')}}</option>
+                <option [value]="3">{{cf.translate('SMS authentication')}}</option>
+                <option [value]="4">{{cf.translate('Start/Stop streaming')}}</option>
+                <option [value]="5">{{cf.translate('Positioning packet interval time setting')}}</option>
+                <option [value]="6">{{cf.translate('Set the media volume of the device')}}</option>
+                <option [value]="7">{{cf.translate('Query the status of the device')}}</option>
+                <option [value]="8">{{cf.translate('Event video upload mode')}}</option>
+                <option [value]="9">{{cf.translate('Query event video upload mode')}}</option>
+                <option [value]="10">{{cf.translate('Set overspeed alarm')}}</option>
+                <option [value]="11">{{cf.translate('Query overspeed alarm parameters')}}</option>
+                <option [value]="12">{{cf.translate('Overtime fatigue driving')}}</option>
+                <option [value]="13">{{cf.translate('The same event trigger interval')}}</option>
+                <option [value]="14">{{cf.translate('Query event trigger interval')}}</option>
+                <option [value]="15">{{cf.translate('Remotely cut off oil and electricity')}}</option>
+                <option [value]="16">{{cf.translate('Query the status of the relay')}}</option>
+              </select>
+            </div>
+          </div>
+          <!-- content -->
+          <div class="flex-div">
+            <label class="col-2 p-0 text-right"></label>
+            <div *ngIf="cmdtype==0" class="col-10">
+              <form [formGroup]="formGroup" (submit)="sendCommand()">
+                <div class="contentdiv">
+                  <div class="label-c">
+                    {{cf.translate('DVR gateway service address')}}
+                  </div>
+                  <div class="content-c">
+                    <div class="form-group small-c">
+                      <label class="fixWidthLabel">{{cf.translate('Ip')}}*:</label>
+                      <div class="fixInputDiv">
+                        <input type="text" class="form-control" formControlName="ip">
+                      </div>
+                    </div>
+                    <div class="form-group small-c">
+                      <label class="fixWidthLabel">{{cf.translate('Port')}}*:</label>
+                      <div class="fixInputDiv">
+                        <input type="text" class="form-control" formControlName="port">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="button-c">
+                  <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Send')}}</button>
+                </div>
+              </form>
+            </div>
+            <div *ngIf="cmdtype==1" class="col-10">
+              <form [formGroup]="formGroup" (submit)="sendCommand()">
+                <div class="contentdiv">
+                  <div class="label-c">
+                    {{cf.translate('Upload address of the file storage')}}
+                  </div>
+                  <div class="content-c">
+                    <div class="form-group small-c">
+                      <label class="fixWidthLabel">{{cf.translate('Ip')}}*:</label>
+                      <div class="fixInputDiv">
+                        <input type="text" class="form-control" formControlName="ip">
+                      </div>
+                    </div>
+                    <div class="form-group small-c">
+                      <label class="fixWidthLabel">{{cf.translate('Port')}}*:</label>
+                      <div class="fixInputDiv">
+                        <input type="text" class="form-control" formControlName="port">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="button-c">
+                  <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Send')}}</button>
+                </div>
+              </form>
+            </div>
+            <div *ngIf="cmdtype==2" class="col-10">
+              <form [formGroup]="formGroup" (submit)="sendCommand()">
+                <div class="contentdiv">
+                  <div class="label-c">
+                    {{cf.translate('RTMP live streaming service address')}}
+                  </div>
+                  <div class="content-c">
+                    <div class="form-group small-c">
+                      <label class="fixWidthLabel">{{cf.translate('Address')}}*:</label>
+                      <div class="fixInputDiv">
+                        <input type="text" class="form-control" formControlName="address">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="button-c">
+                  <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Send')}}</button>
+                </div>
+              </form>
+            </div>
+            <div *ngIf="cmdtype==3" class="col-10">
+              <form [formGroup]="formGroup" (submit)="sendCommand()">
+                <div class="contentdiv">
+                  <div class="label-c">
+                    {{cf.translate('SMS authentication')}}
+                  </div>
+                  <div class="content-c">
+                    <div class="form-group small-c">
+                      <label class="fixWidthLabel">{{cf.translate('Account')}}*:</label>
+                      <div class="fixInputDiv">
+                        <input type="text" class="form-control" formControlName="account">
+                      </div>
+                    </div>
+                    <div class="form-group small-c">
+                      <label class="fixWidthLabel">{{cf.translate('Password')}}*:</label>
+                      <div class="fixInputDiv">
+                        <input type="text" class="form-control" formControlName="password">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="button-c">
+                  <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Send')}}</button>
+                </div>
+              </form>
+            </div>
+
+            <div *ngIf="cmdtype==4" class="col-10">
+              <form [formGroup]="formGroup" (submit)="sendCommand()">
+                <div class="contentdiv">
+                  <div class="label-c">
+                    {{cf.translate('Start/Stop streaming')}}
+                  </div>
+                  <div class="content-c">
+                    <div class="form-check form-check-inline mr-1">
+                      <input class="form-check-input" type="radio" formControlName="val" [value]="1">
+                      <label class="form-check-label">{{cf.translate('Start streaming')}}</label>
+                    </div>
+                    <div class="form-check form-check-inline mr-1">
+                      <input class="form-check-input" type="radio" formControlName="val" [value]="0">
+                      <label class="form-check-label">{{cf.translate('Stop streaming')}}</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="button-c">
+                  <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Send')}}</button>
+                </div>
+              </form>
+            </div>
+
+            <div *ngIf="cmdtype==5" class="col-10">
+              <form [formGroup]="formGroup" (submit)="sendCommand()">
+                <div class="contentdiv">
+                  <div class="label-c">
+                    {{cf.translate('Positioning packet interval time setting')}}
+                  </div>
+                  <div class="content-c">
+                    <div class="form-group small-c">
+                      <label class="fixWidthLabel">{{cf.translate('Timer interval(s)')}}*:</label>
+                      <div class="fixInputDiv">
+                        <input type="number" class="form-control" formControlName="val">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="button-c">
+                  <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Send')}}</button>
+                </div>
+              </form>
+            </div>
+
+            <div *ngIf="cmdtype==6" class="col-10">
+              <form [formGroup]="formGroup" (submit)="sendCommand()">
+                <div class="contentdiv">
+                  <div class="label-c">
+                    {{cf.translate('Set the media volume of the device')}}
+                  </div>
+                  <div class="content-c">
+                    <div class="form-check mr-1">
+                      <input class="form-check-input" type="radio" formControlName="val" [value]="0">
+                      <label class="form-check-label">{{cf.translate('off')}}</label>
+                    </div>
+                    <div class="form-check mr-1">
+                      <input class="form-check-input" type="radio" formControlName="val" [value]="1">
+                      <label class="form-check-label">{{cf.translate('low')}}</label>
+                    </div>
+                    <div class="form-check mr-1">
+                      <input class="form-check-input" type="radio" formControlName="val" [value]="2">
+                      <label class="form-check-label">{{cf.translate('medium')}}</label>
+                    </div>
+                    <div class="form-check mr-1">
+                      <input class="form-check-input" type="radio" formControlName="val" [value]="3">
+                      <label class="form-check-label">{{cf.translate('high')}}</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="button-c">
+                  <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Send')}}</button>
+                </div>
+              </form>
+            </div>
+
+            <div *ngIf="cmdtype==7" class="col-10">
+              <form [formGroup]="formGroup" (submit)="sendCommand()">
+                <div class="contentdiv">
+                  <div class="label-c">
+                    {{cf.translate('Query the status of the device')}}
+                  </div>
+                  <div class="content-c">
+                    <div class="form-check form-check-inline mr-1">
+                      <input class="form-check-input" type="radio" formControlName="val" [value]="'STATUS'">
+                      <label class="form-check-label">{{cf.translate('Status query')}}</label>
+                    </div>
+                    <div class="form-check form-check-inline mr-1">
+                      <input class="form-check-input" type="radio" formControlName="val" [value]="'PARAM'">
+                      <label class="form-check-label">{{cf.translate('Parameter query')}}</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="button-c">
+                  <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Send')}}</button>
+                </div>
+              </form>
+            </div>
+
+            <div *ngIf="cmdtype==8" class="col-10">
+              <form [formGroup]="formGroup" (submit)="sendCommand()">
+                <div class="contentdiv">
+                  <div class="label-c">
+                    {{cf.translate('Event video upload mode')}}
+                  </div>
+                  <div class="content-c">
+                    <div class="form-group small-c">
+                      <label class="fixWidthLabel">{{cf.translate('Event type')}}*:</label>
+                      <div class="fixInputDiv">
+                        <select class="form-control" formControlName="A">
+                          <option *ngFor="let item of event_type">{{item}}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group small-c">
+                      <label class="fixWidthLabel">{{cf.translate('Active upload')}}*:</label>
+                      <div class="fixInputDiv">
+                        <select class="form-control" formControlName="B">
+                          <option value="ON">{{cf.translate('ON')}}</option>
+                          <option value="OFF">{{cf.translate('OFF')}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="button-c">
+                  <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Send')}}</button>
+                </div>
+              </form>
+            </div>
+
+            <div *ngIf="cmdtype==9" class="col-10">
+              <form [formGroup]="formGroup" (submit)="sendCommand()">
+                <div class="contentdiv">
+                  <div class="label-c">
+                    {{cf.translate('Query event video upload mode')}}
+                  </div>
+                  <div class="content-c">
+                    <div class="form-group small-c">
+                      <label class="fixWidthLabel">{{cf.translate('Type')}}*:</label>
+                      <div class="fixInputDiv">
+                        <select class="form-control" formControlName="A">
+                          <option *ngFor="let item of event_type">{{item}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="button-c">
+                  <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Send')}}</button>
+                </div>
+              </form>
+            </div>
+
+            <div *ngIf="cmdtype==10" class="col-10">
+              <form [formGroup]="formGroup" (submit)="sendCommand()">
+                <div class="contentdiv">
+                  <div class="label-c">
+                    {{cf.translate('Set overspeed alarm')}}
+                  </div>
+                  <div class="content-c">
+                    <div class="form-group">
+                      <label class="fixWidthLabel" style="width: 200px;">{{cf.translate('Enable alarm')}}*:</label>
+                      <div class="form-check form-check-inline mr-1">
+                        <input class="form-check-input" type="radio" formControlName="A" value="ON">
+                        <label class="form-check-label">{{cf.translate('ON')}}</label>
+                      </div>
+                      <div class="form-check form-check-inline mr-1">
+                        <input class="form-check-input" type="radio" formControlName="A" value="OFF">
+                        <label class="form-check-label">{{cf.translate('OFF')}}</label>
+                    </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="fixWidthLabel" style="width: 200px;">{{cf.translate('Time range(s)')}}*:</label>
+                      <input class="form-control" style="width: auto;" type="number" formControlName="T" placeholder="5-600s">
+                    </div>
+                    <div class="form-group">
+                      <label class="fixWidthLabel" style="width: 200px;">{{cf.translate('Overspeed threshold(km/h)')}}*:</label>
+                      <input class="form-control" style="width: auto;"  type="number" formControlName="M" placeholder="1-255km/h">
+                    </div>
+                  </div>
+                </div>
+                <div class="button-c">
+                  <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Send')}}</button>
+                </div>
+              </form>
+            </div>
+
+            <div *ngIf="cmdtype==11" class="col-10">
+              <form [formGroup]="formGroup" (submit)="sendCommand()">
+                <div class="contentdiv">
+                  <div class="label-c">
+                    {{cf.translate('Query overspeed alarm parameters')}}
+                  </div>
+                  <div class="content-c">
+                    <div class="form-group small-c">
+                      <label class="fixWidthLabel">{{cf.translate('Detail')}}:</label>
+                      <div class="fixInputDiv" style="padding-top:6px">
+                        {{cf.translate('No parameters in this command.')}}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="button-c">
+                  <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Send')}}</button>
+                </div>
+              </form>
+            </div>
+
+            <div *ngIf="cmdtype==12" class="col-10">
+              <form [formGroup]="formGroup" (submit)="sendCommand()">
+                <div class="contentdiv">
+                  <div class="label-c">
+                    {{cf.translate('Overtime fatigue driving')}}
+                  </div>
+                  <div class="content-c">
+                    <div class="form-group">
+                      <label class="fixWidthLabel" style="width: 200px;">{{cf.translate('ON/OFF')}}*:</label>
+                      <div class="form-check form-check-inline mr-1">
+                        <input class="form-check-input" type="radio" formControlName="A" value="ON">
+                        <label class="form-check-label">{{cf.translate('ON')}}</label>
+                      </div>
+                      <div class="form-check form-check-inline mr-1">
+                        <input class="form-check-input" type="radio" formControlName="A" value="OFF">
+                        <label class="form-check-label">{{cf.translate('OFF')}}</label>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="fixWidthLabel" style="width: 200px;">{{cf.translate('Driving time')}}*:</label>
+                        <input class="form-control" style="width: auto;" type="number" formControlName="time1">
+                    </div>
+                    <div class="form-group">
+                      <label class="fixWidthLabel" style="width: 200px;">{{cf.translate('Time interval')}}*:</label>
+                      <input class="form-control" style="width: auto;" type="number" formControlName="time2">
+                    </div>
+                  </div>
+                </div>
+                <div class="button-c">
+                  <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Send')}}</button>
+                </div>
+              </form>
+            </div>
+
+            <div *ngIf="cmdtype==13" class="col-10">
+              <form [formGroup]="formGroup" (submit)="sendCommand()">
+                <div class="contentdiv">
+                  <div class="label-c">
+                    {{cf.translate('The same event trigger interval')}}
+                  </div>
+                  <div class="content-c">
+                    <div class="form-group">
+                      <label class="fixWidthLabel">{{cf.translate('Event type')}}*:</label>
+                      <select class="form-control" formControlName="A" style="width: 200px;">
+                        <option *ngFor="let item of event_type">{{item}}</option>
+                      </select>
+                    </div>
+                    <div class="form-group ">
+                      <label class="fixWidthLabel">{{cf.translate('Interval time(min)')}}*:</label>
+                      <input type="number" style="width: 200px;" class="form-control" formControlName="B" placeholder="1-60 mins">
+                    </div>
+                  </div>
+                </div>
+                <div class="button-c">
+                  <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Send')}}</button>
+                </div>
+              </form>
+            </div>
+
+            <div *ngIf="cmdtype==14" class="col-10">
+              <form [formGroup]="formGroup" (submit)="sendCommand()">
+                <div class="contentdiv">
+                  <div class="label-c">
+                    {{cf.translate('Query event trigger interval')}}
+                  </div>
+                  <div class="content-c">
+                    <div class="form-group">
+                      <label class="fixWidthLabel">{{cf.translate('Event type')}}*:</label>
+                      <select class="form-control" formControlName="A" style="width: 200px;">
+                        <option *ngFor="let item of event_type">{{item}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="button-c">
+                  <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Send')}}</button>
+                </div>
+              </form>
+            </div>
+
+            <div *ngIf="cmdtype==15" class="col-10">
+              <form [formGroup]="formGroup" (submit)="sendCommand()">
+                <div class="contentdiv">
+                  <div class="label-c">
+                    {{cf.translate('Remotely cut off oil and electricity')}}
+                  </div>
+                  <div class="content-c">
+                    <div class="form-check form-check-inline mr-1">
+                      <input class="form-check-input" type="radio" formControlName="A" [value]="0">
+                      <label class="form-check-label">{{cf.translate('connect oil and electricity')}}</label>
+                    </div>
+                    <div class="form-check form-check-inline mr-1">
+                      <input class="form-check-input" type="radio" formControlName="A" [value]="1">
+                      <label class="form-check-label">{{cf.translate('disconnect oil and electricity')}}</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="button-c">
+                  <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Send')}}</button>
+                </div>
+              </form>
+            </div>
+
+            <div *ngIf="cmdtype==16" class="col-10">
+              <form [formGroup]="formGroup" (submit)="sendCommand()">
+                <div class="contentdiv">
+                  <div class="label-c">
+                    {{cf.translate('Query the status of the relay')}}
+                  </div>
+                  <div class="content-c">
+                    <div class="form-group small-c">
+                      <label class="fixWidthLabel">{{cf.translate('Detail')}}:</label>
+                      <div class="fixInputDiv" style="padding-top:6px">
+                        {{cf.translate('No parameters in this command.')}}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="button-c">
+                  <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Send')}}</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->

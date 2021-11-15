@@ -1,0 +1,63 @@
+<div class="login-bg" style="background-image: url('assets/img/mainImg.jpg'); height:100vh;">
+  <div class="login-layer">
+    <div class="loginStyle1">
+      <form [formGroup]="formGroup" #myform="ngForm" (ngSubmit)="login()">
+        <h1 class="logo-login">
+          <img src="assets/img/logo.png" width="318" height="81" alt="AirFlyBird">
+        </h1>
+        <div *ngIf="message" class="messageDIV">
+          {{message}}
+        </div>
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text"><i class="icon-user"></i></span>
+          </div>
+          <input type="text" class="form-control" placeholder="{{ 'phone_number' | translate }}" formControlName="username">
+        </div>
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text"><i class="icon-lock"></i></span>
+          </div>
+          <input type="password" class="form-control" placeholder="{{ 'password' | translate }}" formControlName="password">
+        </div>
+        <div class="input-group mb-3 roleDiv">
+          <div class="input-group-prepend">
+            <span class="input-group-text"><i class="cil-group"></i></span>
+          </div>
+          <div class="form-check form-check-inline mr-3" >
+            <input class="form-check-input" type="radio" formControlName="role" value="admin">
+            <label class="form-check-label" for="inlineRadio1">{{ 'admin' | translate }} </label>
+          </div>
+          <div class="form-check form-check-inline mr-4">
+            <input class="form-check-input" type="radio" formControlName="role" value="agent">
+            <label class="form-check-label" for="inlineRadio2">{{ 'agent' | translate }}</label>
+          </div>
+          <div class="form-check form-check-inline mr-4">
+            <input class="form-check-input" type="radio" formControlName="role" value="user">
+            <label class="form-check-label" for="inlineRadio3">{{ 'user' | translate }}</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-left">
+            <div class="btn-group" dropdown>
+              <button dropdownToggle type="button" class="btn btn-link px-0 dropdown-toggle" style="color: yellow; text-decoration: none;">{{currentLanguage=='en'?'English':'Chinese'|translate}} <span class="caret"></span></button>
+              <ul *dropdownMenu class="dropdown-menu" role="menu">
+                <li role="menuitem"><a class="dropdown-item" (click)="changeLang('en')" style="cursor: pointer;">{{'English'|translate}}</a></li>
+                <li role="menuitem"><a class="dropdown-item" (click)="changeLang('ch')" style="cursor: pointer;">{{'Chinese'|translate}}</a></li>
+              </ul>
+            </div>
+          </div>
+          <!-- <div class="col-6 text-right">
+            <button type="button" class="btn btn-link px-0" style="color: yellow;">Forgot password?</button>
+          </div> -->
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary px-4 loginButton">{{'login'|translate}}</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+</div>

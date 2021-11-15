@@ -1,0 +1,84 @@
+<mat-drawer-container class="side-nav-container" autosize>
+    <mat-drawer #customerList class="side-nav-sidenav" mode="side" [opened]="true">
+      <div class="nav-tile-text-bold text-center">{{cf.translate('Customer')}}</div>
+      <span class="toggle-tree-btn">
+        <button type="button" class="btn btn-block btn-outline" (click)="customerList.toggle(); _openedCustomer = !_openedCustomer">
+          <i class="fa fa-caret-left" aria-hidden="true"></i>
+        </button>
+      </span>
+      <div style="padding: 1rem;">
+        <app-customer-list-tree (selectedItems)="customerViewChange($event)"></app-customer-list-tree>
+      </div>
+    </mat-drawer>
+    <div class="side-nav-content">
+        <mat-drawer-container class="side-nav-container" autosize>
+            <mat-drawer #searchList class="side-nav-sidenav" mode="side" [opened]="true">
+              <div class="nav-tile-text-bold text-center">{{cf.translate('Search')}}</div>
+              <span class="toggle-tree-btn-right">
+                <button *ngIf="!_openedCustomer" type="button" class="btn btn-block btn-outline" (click)="customerList.toggle(); _openedCustomer = !_openedCustomer">
+                  <i class="fa fa-caret-right" aria-hidden="true"></i>
+                </button>
+              </span>
+              <span class="toggle-tree-btn">
+                <button type="button" class="btn btn-block btn-outline" (click)="searchList.toggle(); _openedSearch = !_openedSearch">
+                  <i class="fa fa-caret-left" aria-hidden="true"></i>
+                </button>
+              </span>
+               <!--Left tabs -->
+               <div style="padding: 1rem;">
+                <app-vehicle-search-list [customer]="treeItem" [imei]="param.imei" (selectedItems)="searchChange($event)" (showItem)="showItemStatus($event)"></app-vehicle-search-list>
+              </div>
+            </mat-drawer>
+            <div class="side-nav-content">
+                <div class="nav-tile-text">{{cf.translate('Monitor')}}</div>
+                <span class="toggle-tree-btn-right">
+                  <button *ngIf="!_openedSearch" type="button" class="btn btn-block btn-outline"
+                    (click)="searchList.toggle(); _openedSearch = !_openedSearch">
+                    <i class="fa fa-caret-right" aria-hidden="true"></i>
+                  </button>
+                </span>
+                <div class="content">
+                  <div class="infoDiv" *ngIf="info_status">
+                    <div style="text-align: center;">
+                      {{info_number}}
+                      <button type="button" class="close" (click)="info_status=false" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div *ngIf="!info_item" style="text-align: center; vertical-align: middle; padding-top: 150px; height: 300px;">
+                      no data...
+                    </div>
+                    <div *ngIf="info_item" class="p-2 m-2">
+                      <div class="row m-0 mb-1">
+                        <label class="fixWidth col-form-label">{{cf.translate('Address')}}:</label>
+                        <div class="outlineDiv" style="height: auto;">
+                          {{info_item.address}}
+                        </div>
+                      </div>
+                      <div class="row m-0 mb-1">
+                        <label class="fixWidth col-form-label">{{cf.translate('Lng')}}:</label>
+                        <div class="outlineDiv">
+                          {{info_item.lng}}
+                        </div>
+                      </div>
+                      <div class="row m-0 mb-1">
+                        <label class="fixWidth col-form-label">{{cf.translate('Lat')}}:</label>
+                        <div class="outlineDiv">
+                          {{info_item.lat}}
+                        </div>
+                      </div>
+                      <div class="row m-0 mb-1">
+                        <label class="fixWidth col-form-label">{{cf.translate('Speed')}}(km/h):</label>
+                        <div class="outlineDiv">
+                          {{info_item.gpsSpeed}}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <app-map-realtime (maploaded)="map_status = true" [gpsdata]="gpsdata"></app-map-realtime>
+                </div>
+            </div>
+          </mat-drawer-container>
+    </div>
+</mat-drawer-container>
+  <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>

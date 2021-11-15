@@ -1,0 +1,29 @@
+<mat-drawer-container class="side-nav-container" autosize>
+    <mat-drawer #drawer class="side-nav-sidenav" mode="side" [opened]="true">
+      <div class="nav-tile-text-bold text-center">{{cf.translate('Detect')}}</div>
+      <span class="toggle-tree-btn">
+        <button type="button" class="btn btn-block btn-outline" (click)="drawer.toggle(); _opened = !_opened">
+          <i class="fa fa-caret-left" aria-hidden="true"></i>
+        </button>
+      </span>
+    <!--Left tabs -->
+    <div class="p-0">
+      <ng-container *ngFor="let item of navItem">
+        <div *ngIf="item.role.length==0||item.role.indexOf(role)!=-1" [class]="curRoute&&curRoute.indexOf(item.url)==0?'menuCursor bg-primary text-white p-2 pt-3 pb-3':'menuCursor text-black p-2 pt-3 pb-3'" (click)="route.navigateByUrl(item.url)">            
+          <div [class]="curRoute&&curRoute.indexOf(item.url)==0?'text-uppercase font-weight-bold text-left h6 text-white':'text-uppercase font-weight-bold text-left h6 text-black'" >{{cf.translate(item.name)}}</div>
+        </div>
+      </ng-container>
+    </div>
+    </mat-drawer>
+    <div *ngIf="!_opened" class="d-md-down-none hambergerDIV">
+        <span class="toggle-tree-btn-right">
+            <button type="button" class="btn btn-block btn-outline"
+              (click)="drawer.toggle(); _opened = !_opened">
+              <i class="fa fa-caret-right" aria-hidden="true"></i>
+            </button>
+        </span>
+    </div>
+    <div class="side-nav-content">
+        <router-outlet></router-outlet>
+    </div>
+</mat-drawer-container>

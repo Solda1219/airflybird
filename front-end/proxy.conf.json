@@ -1,0 +1,14 @@
+{
+  "/_api/*": {
+    "target": "http://localhost:80",
+    "secure": false
+  },
+  "/_public/*": {
+    "target": "http://localhost:80",
+    "secure": false
+  },
+  "/live_api/*":{
+    "target": "http://localhost:80",
+    "secure": false
+  }
+}

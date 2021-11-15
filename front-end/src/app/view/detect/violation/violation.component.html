@@ -1,0 +1,27 @@
+<mat-drawer-container class="side-nav-container" autosize>
+    <mat-drawer #drawer class="side-nav-sidenav" mode="side" [opened]="true">
+      <div class="nav-tile-text-bold text-center">{{cf.translate('Device')}}</div>
+      <span class="toggle-tree-btn">
+        <button type="button" class="btn btn-block btn-outline" (click)="drawer.toggle(); _opened = !_opened">
+          <i class="fa fa-caret-left" aria-hidden="true"></i>
+        </button>
+      </span>
+      <!--Left tabs -->
+      <div style="padding: 1rem;">
+        <app-customer-list-tree (selectedItems)="treeViewChange($event)"></app-customer-list-tree>
+      </div>
+    </mat-drawer>
+  
+    <div class="side-nav-content">
+      <div class="nav-tile-text">{{cf.translate('Traffic violations')}}</div>
+      <span class="toggle-tree-btn-right">
+        <button *ngIf="!_opened" type="button" class="btn btn-block btn-outline"
+          (click)="drawer.toggle(); _opened = !_opened">
+          <i class="fa fa-caret-right" aria-hidden="true"></i>
+        </button>
+      </span>
+      <div class="content">
+        <app-violation-index [treeItem]="treeItem"></app-violation-index>
+      </div>
+    </div>
+  </mat-drawer-container>

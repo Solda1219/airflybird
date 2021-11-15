@@ -1,0 +1,118 @@
+<app-header
+    [navbarBrandRouterLink]="['/home']"
+    [fixed]="true"
+    [navbarBrandFull]="{src: 'assets/img/brand/logo.svg', width: 89, height: 25, alt: 'CoreUI Logo'}"
+    [navbarBrandMinimized]="{src: 'assets/img/brand/sygnet.svg', width: 30, height: 30, alt: 'CoreUI Logo'}"
+    [sidebarToggler]="false"
+    [asideMenuToggler]="false"
+  >
+  <ul class="nav navbar-nav d-md-down-none">
+    <ng-container *ngFor="let item of navItem">
+        <li *ngIf="item.role.length==0||item.role.indexOf(role)!=-1" class="nav-item px-3">
+          <a [class]="curRoute&&curRoute.indexOf(item.url)==0?'nav-link activeRoute':'nav-link'" [routerLink]="item.url"><i [class]="item.icon"></i>{{item.name|translate}}</a>
+        </li>
+    </ng-container>
+  </ul>
+  <ul class="nav navbar-nav ml-auto d-md-down-none">
+    <li class="nav-item dropdown" dropdown placement="bottom right">
+      <a class="nav-link" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" dropdownToggle (click)="false">
+        <img class="img-avatar" [src]="avatar" (error)="avatar=defaultImage"/>{{nickname}}
+      </a>
+      <div class="dropdown-menu dropdown-menu-right" *dropdownMenu aria-labelledby="simple-dropdown">
+        <div class="divider"></div>
+        <a class="dropdown-item" (click)="showResetModal()"><i class="fa fa-shield"></i> {{'Reset password'|translate}}</a>
+        <a class="dropdown-item" (click)="logOut()"><i class="fa fa-lock"></i> {{'Log out'|translate}}</a>
+      </div>
+    </li>
+    <li class="nav-item dropdown" dropdown placement="bottom right">
+      <a class="nav-link" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" dropdownToggle (click)="false">
+        <img class="img-avatar img-language" [src]="LanguageImage[currentLanguage]">
+      </a>
+      <div class="dropdown-menu dropdown-menu-right" *dropdownMenu aria-labelledby="simple-dropdown">
+        <a class="dropdown-item" (click)="changeLang('en')">{{'English'|translate}}</a>
+        <a class="dropdown-item" (click)="changeLang('ch')">{{'Chinese'|translate}}</a>
+      </div>
+    </li>
+  </ul>
+</app-header>
+<div class="app-body">
+  <app-sidebar [ngClass]="'d-lg-none'" #appSidebar [fixed]="true" [display]="false" [minimized]="sidebarMinimized" (minimizedChange)="toggleMinimize($event)">
+    <app-sidebar-nav [navItems]="navItem" [perfectScrollbar] [disabled]="appSidebar.minimized"></app-sidebar-nav>
+    <app-sidebar-minimizer></app-sidebar-minimizer>
+  </app-sidebar>
+  <!-- Main content -->
+  <main class="main">
+      <router-outlet></router-outlet>
+      <app-alarm-alert></app-alarm-alert>
+  </main>
+  <app-aside [fixed]="true" [display]="false" [ngClass]="'d-lg-none'">
+    <div class="list-group list-group-accent">
+      <div class="list-group-item list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">
+        {{nickname}}
+      </div>
+      <div class="list-group-item list-group-item-accent-info">
+        <a class="dropdown-item" (click)="showResetModal()"><i class="fa fa-shield"></i> {{'Reset password'|translate}}</a>
+      </div>
+      <div class="list-group-item list-group-item-accent-info">
+        <a class="dropdown-item" (click)="logOut()"><i class="fa fa-lock"></i> {{'Log out'|translate}}</a>
+      </div>
+    </div>
+    <div class="list-group list-group-accent">
+      <div class="list-group-item list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">
+        {{languageName|translate}}
+      </div>
+      <div class="list-group-item list-group-item-accent-info">
+        <a class="dropdown-item" (click)="changeLang('en')">{{'English'|translate}}</a>
+      </div>
+      <div class="list-group-item list-group-item-accent-info">
+        <a class="dropdown-item" (click)="changeLang('ch')">{{'Chinese'|translate}}</a>
+      </div>
+    </div>
+  </app-aside>
+</div>
+<!-- <app-footer>
+  <span><a href="https://coreui.io">CoreUI</a> &copy; 2021 creativeLabs.</span>
+  <span class="ml-auto">Powered by <a href="https://coreui.io/angular">CoreUI for Angular</a></span>
+</app-footer> -->
+<!-- reset password modal -->
+<div bsModal [config]="{backdrop: 'static',  keyboard: false}" #resetModal="bs-modal" class="modal fade" tabindex="-1"
+  role="dialog" aria-labelledby="streamModal" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form [formGroup]="formGroup" (submit)="resetPassword()">
+        <div class="modal-header">
+          <h4 class="modal-title">{{cf.translate('Reset password')}}</h4>
+          <button type="button" class="close" (click)="resetModal.hide();" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body modalWidthHeight">
+            <div class="form-group row  m-0 mb-4">
+              <label class="fixWidthLabel">{{cf.translate('Prev password')}}</label>
+              <div class="fixInputDiv">
+                <input type="password" class="form-control" formControlName="old_password">
+              </div>
+            </div>
+            <div class="form-group row  m-0 mb-4">
+              <label class="fixWidthLabel">{{cf.translate('New password')}}</label>
+              <div class="fixInputDiv">
+                <input type="password" class="form-control" formControlName="new_password">
+              </div>
+            </div>
+            <div class="form-group row  m-0 mb-4">
+              <label class="fixWidthLabel">{{cf.translate('Confirm password')}}</label>
+              <div class="fixInputDiv">
+                <input type="password" class="form-control" formControlName="confirm">
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary"
+            (click)="resetModal.hide()">{{cf.translate("Close")}}</button>
+          <button type="submit"
+            class="btn btn-primary">{{cf.translate('Save')}}</button>
+        </div>
+      </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

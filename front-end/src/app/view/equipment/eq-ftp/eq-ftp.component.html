@@ -1,0 +1,168 @@
+<div class="nav-tile-text">{{cf.translate('FTP server manage')}}</div>
+<div class="content row p-3">
+
+    <div class="col-md-2">
+        <button type="button" type="submit" class="btn btn-primary rigid-btn" (click)="showCreateModal()">
+            <i class="fa fa-plus fa-lg"></i>{{cf.translate('Create Server')}}
+        </button>
+    </div>
+    <!-- <div class="col-md-3 col-sm-6 noPadding">
+        <select type="number" class="form-control" [(ngModel)]="param.expire" (change)="setTableList()">
+            <option value="0">{{cf.translate('All')}}</option>
+            <option value="1">{{cf.translate('Expired')}}</option>
+            <option value="2">{{cf.translate('About to expire')}}</option>
+            <option value="3">{{cf.translate('Available')}}</option>
+        </select>
+    </div>
+    <div class="col-md-3 col-sm-6 noPadding">
+        <select type="number" class="form-control" [(ngModel)]="param.install" (change)="setTableList()">
+            <option value="0">{{cf.translate('All')}}</option>
+            <option value="1">{{cf.translate('Installed')}}</option>
+            <option value="2">{{cf.translate('Not Installed')}}</option>
+        </select>
+    </div> -->
+    <!-- <div class="col-md-4 noPadding">
+        <button type="button" class="btn btn-primary rigid-btn" (click)="search()">Search</button>
+        <button type="button" class="btn btn-outline-dark rigid-btn rigid-default"
+            (click)="exportToExcel()">Export</button>
+    </div> -->
+</div>
+<div class="p-3">
+    <app-eq-ftp-table [item]="tableList" (openEditModal)="showEditModal($event)" (deleteItems)="del($event)" (editItems)="editList($event)"></app-eq-ftp-table>
+</div>
+<!-- loading -->
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+
+<!-- modalpart -->
+<!--creation modal -->
+<div bsModal [config]="{backdrop: 'static',  keyboard: false}" #createModal="bs-modal" class="modal fade p-3"
+    tabindex="-1" role="dialog" aria-labelledby="streamModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form #myform="ngForm" *ngIf="formGroup" [formGroup]="formGroup"
+                (submit)="(formGroup.value['id']?edit():create())">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        {{!formGroup.value.id?cf.translate('Create Server'):cf.translate('Edit Server')}}</h5>
+                    <button type="button" class="close" (click)="createModal.hide();" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body  pl-5 pr-5">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Server ID')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]="" formControlName="server_id">
+                                    <div *ngIf="formGroup.get('server_id').invalid && (myform.submitted||formGroup.get('server_id').dirty || formGroup.get('server_id').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Server Name')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]="" formControlName="server_name">
+                                    <div *ngIf="formGroup.get('server_name').invalid && (myform.submitted||formGroup.get('server_name').dirty || formGroup.get('server_name').touched)"  class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}} </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('IP Address')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]="" formControlName="ip_address">
+                                    <div *ngIf="formGroup.get('ip_address').invalid && (myform.submitted||formGroup.get('ip_address').dirty || formGroup.get('ip_address').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Port')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]="" formControlName="port">
+                                    <div *ngIf="formGroup.get('port').invalid && (myform.submitted||formGroup.get('port').dirty || formGroup.get('port').touched)"  class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}} </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Protocol')}}</label>
+                                <div class="fixInputDiv">
+                                    <select type="text" class="form-control" formControlName="protocol">
+                                        <option *ngFor="let item of protocol" [value]="item.id">{{item.name}}</option>
+                                    </select>
+                                    <div *ngIf="formGroup.get('protocol').invalid && (myform.submitted||formGroup.get('protocol').dirty || formGroup.get('protocol').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Encryption')}}</label>
+                                <div class="fixInputDiv">
+                                    <select type="text" class="form-control" formControlName="encryption">
+                                        <option *ngFor="let item of encryption" [value]="item.id">{{item.name}}</option>
+                                    </select>
+                                    <div *ngIf="formGroup.get('encryption').invalid && (myform.submitted||formGroup.get('encryption').dirty || formGroup.get('encryption').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Login Type')}}</label>
+                                <div class="fixInputDiv">
+                                    <select type="text" class="form-control" formControlName="login_type">
+                                        <option *ngFor="let item of loginType" [value]="item.id">{{item.name}}</option>
+                                    </select>
+                                    <div *ngIf="formGroup.get('login_type').invalid && (myform.submitted||formGroup.get('login_type').dirty || formGroup.get('login_type').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('User Name')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]="" formControlName="user_name">
+                                    <div *ngIf="formGroup.get('user_name').invalid && (myform.submitted||formGroup.get('user_name').dirty || formGroup.get('user_name').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Password')}}</label>
+                                <div class="fixInputDiv">
+                                    <input type="text" class="form-control" [placeholder]="" formControlName="password">
+                                    <div *ngIf="formGroup.get('password').invalid && (myform.submitted||formGroup.get('password').dirty || formGroup.get('password').touched)"  class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}} </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group row m-0 mb-4">
+                                <label class="fixWidthLabel">{{cf.translate('Description')}}</label>
+                                <div class="fixInputDiv">
+                                    <textarea type="text" class="form-control" [placeholder]="" formControlName="description"></textarea>
+                                    <div *ngIf="formGroup.get('description').invalid && (myform.submitted||formGroup.get('description').dirty || formGroup.get('description').touched)" class="invalid-feedback" style="display: block;">{{cf.translate('This field is required.')}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        (click)="createModal.hide()">{{cf.translate("Close")}}</button>
+                    <button type="submit"
+                        class="btn btn-primary">{{!formGroup.value.id?cf.translate('Create'):cf.translate('Edit')}}</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

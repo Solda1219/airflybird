@@ -1,0 +1,72 @@
+.card{
+  height: 150px;
+}
+.routeIcon{
+  font-size: 60px;
+  color: white;
+}
+.routeText{
+  font-size: 18px;
+  color: white;
+}
+.containerDiv{
+  display: flex;
+  min-width: 800px;
+  overflow-x: hidden;
+}
+.containerDivFRT{
+  display: flex;
+  min-width: 800px;
+  overflow-x: hidden;
+  margin-right: 14px;
+}
+.subContainer{
+  width: 50%;
+  min-width: 500px;
+}
+.subContainerFRT{
+  width: 100%;
+  min-width: 800px;
+}
+.cardDiv{
+  display: flex;
+}
+.card{
+  width: 50%;
+  height: auto !important;
+  position: relative;
+  margin: 2px;
+  border-radius: 0px;
+}
+.card:before {
+  content: "";
+  display: block;
+  padding-top: 100%;
+}
+.card-body{
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  display: grid;
+}
+/* Other ratios */
+
+.ratio2_1:before {
+  padding-top: 50%;
+}
+
+.ratio1_2:before {
+  padding-top: 200%;
+}
+
+.ratio4_3:before {
+  padding-top: 75%;
+}
+.ratio4_1:before {
+  padding-top: 25%;
+}
+.ratio16_9:before {
+  padding-top: 56.25%;
+}

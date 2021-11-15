@@ -1,0 +1,184 @@
+<mat-drawer-container class="side-nav-container" autosize>
+    <mat-drawer #drawer class="side-nav-sidenav" mode="side" [opened]="true">
+        <div class="nav-tile-text-bold text-center">{{cf.translate('Setting')}}</div>
+        <span class="toggle-tree-btn">
+            <button type="button" class="btn btn-block btn-outline" (click)="drawer.toggle(); _opened = !_opened">
+                <i class="fa fa-caret-left" aria-hidden="true"></i>
+            </button>
+        </span>
+        <!-- loading -->
+        <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+        <div class="sideNavChild-full">
+            <!--Left tabs -->
+            <div class="p-2">
+                <form *ngIf="formGroup" [formGroup]="formGroup" (submit)="getInfo()">
+                    <div class="form-group row  m-0">
+                        <label class="fixWidthLabel-sm" style="padding-top: 19px;"></label>
+                        <div class="fixInputDiv-sm text-right">
+                            <div class="form-check form-check-inline mr-1" id="inline-radios">
+                                <input class="form-check-input" type="radio" formControlName="history_tag" [value]="false" (change)="getAvailableDate()">
+                                <label class="form-check-label">{{cf.translate('Recent')}}</label>
+                            </div>
+                            <div class="form-check form-check-inline mr-1">
+                                <input class="form-check-input" type="radio" formControlName="history_tag" [value]="true" (change)="getAvailableDate()">
+                                <label class="form-check-label">{{cf.translate('History')}}</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row  m-0">
+                        <label class="fixWidthLabel-sm" style="padding-top: 19px;">{{cf.translate('Date')}}</label>
+                        <div class="fixInputDiv-sm">
+                            <mat-form-field class="example-full-width" appearance="fill" style="width: 100%;">
+                                <mat-label *ngIf="datelist.length>0 && date_status">{{cf.translate('Choose a date')}}</mat-label>
+                                <mat-label *ngIf="datelist.length==0 && date_status" style="color: red;">{{cf.translate('No trip')}}</mat-label>
+                                <mat-label *ngIf="!date_status" style="color: red;">Loading...</mat-label>
+                                <input matInput [matDatepicker]="picker" formControlName="date" (dateChange)="changeDate()">
+                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                <mat-datepicker [dateClass]="dateClass" #picker></mat-datepicker>
+                            </mat-form-field>
+                            <div *ngIf="formGroup.get('date').invalid && (formGroup.get('date').dirty || formGroup.get('date').touched)"
+                                class="invalid-feedback" style="display: block;">
+                                {{cf.translate('This field is required')}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row  m-0 mb-4">
+                        <label class="fixWidthLabel-sm">{{cf.translate('Start')}}</label>
+                        <div class="fixInputDiv-sm">
+                            <input type="text" class="form-control" formControlName="start">
+                            <div *ngIf="formGroup.get('start').invalid && (formGroup.get('start').dirty || formGroup.get('start').touched)"
+                                class="invalid-feedback" style="display: block;">
+                                {{cf.translate('This field is required')}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row  m-0 mb-4">
+                        <label class="fixWidthLabel-sm">{{cf.translate('End')}}</label>
+                        <div class="fixInputDiv-sm">
+                            <input type="text" class="form-control" formControlName="end">
+                            <div *ngIf="formGroup.get('end').invalid && (formGroup.get('end').dirty || formGroup.get('end').touched)"
+                                class="invalid-feedback" style="display: block;">
+                                {{cf.translate('This field is required')}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pl-3">
+                        <button type="button" type="submit" class="btn btn-primary rigid-btn" style="width: 100%;">
+                            {{cf.translate('Search playback')}}
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <!-- address -->
+            <div class="p-2">
+                <div class="p-2" style="border:solid 1px grey">
+                    <div class="row m-0 mb-1" style="align-items: center;">
+                        <div class="col-2">
+                            <img src="assets/img/icon/startMarker.png">
+                        </div>
+                        <div class="col-10">
+                            {{startAddr}}
+                        </div>
+                    </div>
+                    <div class="row m-0 mb-1" style="align-items: center;">
+                        <div class="col-2">
+                            <img src="assets/img/icon/endMarker.png">
+                        </div>
+                        <div class="col-10">
+                            {{endAddr}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-2">
+                <div style="display: flex;align-items: center;">
+                    <div style="width: 40%;">
+                        {{cf.translate('Speed')}}:{{sliderParam.speed}}
+                    </div>
+                    <div style="width: 60%;">
+                        {{cf.translate('Total mile')}}:{{sliderParam.totalMile}}
+                    </div>
+                </div>
+                <div style="display: flex;align-items: center; margin-top: -11px;">
+                    <button type="button" class="btn btn-sm btn-pill playbutton" (click)="stopAndStart()">
+                        <i [class]="sliderStart?'fa fa-pause fa-lg':'fa fa-play-circle fa-lg'"></i>
+                    </button>
+                    <mat-slider class="example-margin" [max]="slider.max" [min]="slider.min" [step]="slider.step"
+                        [(ngModel)]="slider.value" style="width: -webkit-fill-available;">
+                    </mat-slider>
+                </div>
+                <div style="display: flex;align-items: center; margin-top: -29px;">
+                    <div style="width: 50%;">
+                        {{sliderParam.time?cf.getDateStringYYYYMMDDHHMMSS(sliderParam.time):''}}
+                    </div>
+                    <div style="width: 50%;">
+                        <mat-slider class="example-margin" [max]="sliderFast.max" [min]="sliderFast.min" [step]="sliderFast.step"
+                             [(ngModel)]="sliderFast.value" style="width: -webkit-fill-available;">
+                         </mat-slider>
+                    </div>
+                </div>
+            </div>
+            <div class="p-2">
+                <div class="form-check form-check-inline mr-1" style="float: right;">
+                    <input type="checkbox" value="1" class="form-check-input">
+                    <label class="form-check-label">{{cf.translate('Driving behavior')}}</label>
+                </div>
+            </div>
+            <!-- video info -->
+            <div class="p-2">
+                <div class="nav-tile-text">
+                    {{cf.translate('Video Info')}}
+                 
+                </div>
+                <div class="p-2" style="border:solid 1px grey; height: 180px; overflow-y: auto;">
+                    <div *ngFor = "let item of video; let i = index">
+                        <div><a style="cursor: pointer;color: blue;" (click)="showSnapVideo(item)">{{cf.translate('FileName')}}:{{item.video_name}}</a></div>
+                        <div>{{cf.translate('StartTime')}}:{{cf.getDateStringYYYYMMDDHHMMSS(item.start_at)}}</div>
+                        <div>{{cf.translate('EndTime')}}:{{cf.getDateStringYYYYMMDDHHMMSS(item.end_at)}}</div>
+                        <hr style="border-color: #20a8d8;"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </mat-drawer>
+    <div *ngIf="!_opened" class="d-md-down-none hambergerDIV">
+        <span class="toggle-tree-btn-right">
+            <button type="button" class="btn btn-block btn-outline" (click)="drawer.toggle(); _opened = !_opened">
+                <i class="fa fa-caret-right" aria-hidden="true"></i>
+            </button>
+        </span>
+    </div>
+    <div class="side-nav-content-full">
+        <div class="nav-tile-text">{{cf.translate('Playback')}}-{{vehicleInfo?vehicleInfo.license_plate_number:""}}
+        </div>
+        <app-map-playback [gpsdata]="gpsdata" [vehicleInfo]="vehicleInfo" [curPoint]="slider.value"></app-map-playback>
+    </div>
+</mat-drawer-container>
+<!-- snapVideoModal modal -->
+<div bsModal [config]="{backdrop: 'static',  keyboard: false}" #snapVideoModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="snapVideoModal" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width: 800px;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" *ngIf="snap_src">
+            {{snap_src.video_name}}-{{cf.getDateStringYYYYMMDDHHMMSS(snap_src.start_at)}}
+          </h5>
+          <button type="button" class="close" (click)="snapVideoModal.hide(); stop()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body modalWidthHeight"> 
+          <div class="videoDiv">
+            <video controls  #snapPlayer class="videoPlayer">
+                <source type="video/mp4" />
+                Browser not supported
+              </video>
+        </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="snapVideoModal.hide(); stop()">Close</button>
+          <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->

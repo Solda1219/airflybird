@@ -1,0 +1,19 @@
+<mat-drawer-container class="side-nav-container vod" autosize>
+    <mat-drawer #drawer class="side-nav-sidenav" mode="side" [opened]="true" style="width: 50% !important;">
+      <span class="toggle-tree-btn">
+        <button type="button" class="btn btn-block btn-outline" (click)="drawer.toggle(); _opened = !_opened">
+          <i class="fa fa-caret-left" aria-hidden="true"></i>
+        </button>
+      </span>
+      <app-vod-status-video-content (vod_selected)="selected=$event" (history_tag)="history_tag=$event" [snap_change]="vod_changed"></app-vod-status-video-content>
+    </mat-drawer>
+    <div *ngIf="!_opened" class="d-md-down-none hambergerDIV" style="width: 50% !important;">
+        <span class="toggle-tree-btn-right">
+            <button type="button" class="btn btn-block btn-outline"
+              (click)="drawer.toggle(); _opened = !_opened">
+              <i class="fa fa-caret-right" aria-hidden="true"></i>
+            </button>
+        </span>
+    </div>
+    <app-vod-status-snap-content [vod_selected]="selected" [history_tag]="history_tag" (vod_changed)="snap_changed()"></app-vod-status-snap-content>
+</mat-drawer-container>

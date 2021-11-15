@@ -1,0 +1,34 @@
+.form-group{
+    display: flex;
+    margin-bottom: 3px !important;
+}
+.card-body{
+    padding:5px !important;
+}
+.form-control{
+    padding:3px;
+}
+.cycle-div{
+    display: flex;
+}
+.retime{
+    width: 50%;
+}
+.search{
+    width: 50%;
+}
+.active{
+    color:green;
+}
+.inactive{
+    color:red;
+}
+.content-overflow{
+    height: calc(100vh - 62px) !important;
+    overflow-y: auto;
+    overflow-x:hidden;
+}
+.text-oneline{
+    overflow: hidden;
+    height: 20px;
+}

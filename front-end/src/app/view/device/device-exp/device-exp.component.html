@@ -1,0 +1,111 @@
+<div class="card-body">
+    <form [formGroup]="formGroup" class="form-horizontal" style="margin-left: 20px;" (submit)="search()">
+      <div class="form-group row">
+        <div class="col-md-3 col-sm-6 autoCT noPadding">
+          <textarea type="text" class="form-control autoResizeTextArea" formControlName="imei" [placeholder]="'IMEI('+cf.translate('Press Enter for multiple lines')+')'"></textarea>
+        </div>
+        <div class="col-md-3 col-sm-6 autoCT noPadding">
+            <textarea type="text" class="form-control autoResizeTextArea" formControlName="carNumber" [placeholder]="cf.translate('Car Number')+'('+cf.translate('Press Enter for multiple lines')+')'"></textarea>
+        </div>
+        <div class="col-md-4 noPadding">
+            <button type="submit" class="btn btn-primary rigid-btn">{{cf.translate('Search')}}</button>
+            <button type="button" class="btn btn-outline-dark rigid-btn rigid-default" (click)="reset()" style="min-width: auto;"><i class="fa fa-refresh"></i></button>
+        </div>
+        <div class="col-md-2 noPadding">
+          <button type="button" class="btn btn-outline-dark rigid-btn rigid-default" (click)="exportToExcel()">{{cf.translate('Export')}}</button>
+        </div>
+      </div>
+      <div class="form-group row noPadding">
+        <div class="col-md-3 col-sm-6 noPadding">
+          <select type="number" class="form-control" formControlName="exp">
+            <option value="1">{{cf.translate('Expiring soon')}}</option>
+            <option value="0">{{cf.translate('Expired')}}</option>
+          </select>
+        </div>
+        <div class="col-md-3 col-sm-6 noPadding">
+            <select type="number" class="form-control" formControlName="days">
+                <option value="0">7 days</option>
+                <option value="1">30 days</option>
+                <option value="2">60 days</option>
+                <option value="3">7~30 days</option>
+                <option value="4">30~60 days</option>
+                <option *ngIf="this.formGroup.value['exp']==1" value="5">>60 days</option>
+            </select>
+        </div>
+      </div>
+    </form>
+</div>      
+<div class="mat-table-content-one">
+  <mat-form-field>
+    <mat-label>Search..</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Search..." #input>
+  </mat-form-field>
+  <div class="mat-elevation-z8 checkTable">
+    <table mat-table [dataSource]="tableList" matSort>
+      <!-- Checkbox Column -->
+      <ng-container matColumnDef="select" sticky>
+        <th mat-header-cell *matHeaderCellDef class="checkTh">
+          <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()"
+                        [aria-label]="checkboxLabel()">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row" class="checkTh">
+          <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)"
+                        [aria-label]="checkboxLabel(row)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
+      <ng-container *ngFor="let rows of tbCol; let i = index">
+        <ng-container [matColumnDef]="rows">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate(tbHeader[i])}} </th>
+          <td mat-cell *matCellDef="let row"> {{row[rows]}} </td>
+        </ng-container>
+      </ng-container>
+      <!-- action -->
+      <ng-container matColumnDef="Action" stickyEnd>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="stickyOperationHeader"> {{cf.translate('Action')}} </th>
+        <td mat-cell *matCellDef="let row" class="stickyOperationCell">
+          <div class="btnRow">
+            <!-- <div class="btn-group">
+              <a class="btnCC badge badge-danger mfs-2">edit</a>
+            </div> -->
+            <div class="btn-group">
+              <a  class="btnCC badge badge-info mfs-2" (click)="monitor(row)">monitor</a>
+            </div>
+            <div class="btn-group">
+              <a [matMenuTriggerFor]="menu"  class="btnCC badge badge-warning mfs-2">more</a>
+              <mat-menu #menu="matMenu">
+                <a mat-menu-item [routerLink]="['/monitor/mornitortracking/',row.device_imei]" target="_blank">
+                  <span>{{cf.translate('playback')}}</span>
+                </a>
+                <a mat-menu-item  [routerLink]="['/monitor/trips/',row.device_imei]" target="_blank">
+                  <span>{{cf.translate('trips')}}</span>
+                </a>
+                <button mat-menu-item (click)="sendPushStream(row)">
+                  <span>Command</span>
+                </button>
+                <!-- <button mat-menu-item>
+                  <span>Send message</span>
+                </button> -->
+              </mat-menu>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  
+      <!-- Row shown when there is no matching data. -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="4">No Item</td>
+      </tr>
+    </table>
+  </div>
+  <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+  <!-- loading -->
+  <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+</div>

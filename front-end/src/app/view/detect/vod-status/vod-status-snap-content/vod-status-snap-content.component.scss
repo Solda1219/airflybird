@@ -1,0 +1,142 @@
+.containerOfimage{
+  display: flex;
+  flex-wrap: wrap;
+  max-height: calc(100vh - 275px);
+  overflow: auto;
+}
+.imageDiv{
+  width: auto;
+  border: solid 1px darkgrey;
+  padding: 5px;
+  margin: 5px;
+}  
+.imageDiv img{
+  width: 300px;
+  height: 200px;
+}
+.flexRootDiv2{
+    width: 100%;
+    display: flex;
+    padding: 0px;
+    height: 24px;
+    overflow: hidden;
+  }
+  .prependDiv2{
+    text-align: left;
+    padding:3px;
+  }
+  .textDiv2{
+   padding: 3px;
+  }
+  .infoDiv{
+    border: solid 1px #ff4081;
+    padding: 3px;
+    margin: 5px 0px;
+    width: 300px;
+  }
+  .btn-smmm{
+    width: 25px;
+    height: 25px;
+    padding: 0px;
+}
+
+
+  .source-img{
+    width: 100% !important;
+  }
+  .videoPlayer{
+    width: 100%;
+    height: auto;
+  }
+  .input-group-prepend {
+    width: 100px;
+  }
+  .input-group-text {
+    width: 100%;
+    background-color: white;
+    color: black;
+  }
+  .modalWidthHeight{
+    max-height: 70vh;
+    overflow-y: auto;
+}
+.datePrependText{
+    padding:0px 5px;
+}
+.input-group{
+    margin-bottom:5px
+}
+mat-slider{
+    width: 100%;
+}
+.form-group{
+    display: flex;
+    margin-bottom: 3px !important;
+}
+.datePrependText{
+  border-width: 0px;
+}
+.badge-div{
+  position: relative;
+  margin-top: -20px;
+  text-align: right;
+  position: relative;
+  bottom: 181px;
+  right: 4px;
+  height: 20px;
+}
+.check-div{
+  position: relative;
+  bottom: -29px;
+  text-align: right;
+  margin-top: -25px;
+}
+.badge-div span{
+  border-radius: 0px;
+}
+.badge-div-form{
+  position: absolute;
+  top: 11px;
+  left: 34px;
+  z-index: 1;
+}
+.carousel-left{
+  position: absolute;
+  top: 200px;
+  left: 38px;
+  z-index: 1;
+}
+.carousel-right{
+  position: absolute;
+  top: 200px;
+  right: 38px;
+  z-index: 1;
+}
+.card-body{
+  padding:5px !important;
+}
+.ignore-line{
+  height: 20px;
+  overflow: hidden;
+}
+.groupDiv{
+  border: solid 1px darkgray;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.headerDiv{
+  border-bottom: solid 2px green;
+  margin: 10px 6px;
+  display: flex;
+}
+.imagecontent{
+  display: flex;
+  flex-wrap: wrap;
+}
+.decoA{
+  color: darkmagenta !important;
+  margin-top: -3px;
+  margin-left: 10px;
+  text-decoration: underline;
+  cursor: pointer;
+}

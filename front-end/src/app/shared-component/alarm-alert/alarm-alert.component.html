@@ -1,0 +1,166 @@
+<audio #audioOption>
+    <source src="assets/audio/alert.wav" type="audio/mp3">
+</audio> 
+<div class="alarmBtn">
+    <button type="button" class="btn btn-block btn-danger no-border" (click)="show()">
+        <i class="fa fa-bell-o fa-lg" *ngIf="bell_status"></i>
+    </button>
+</div>
+<div *ngIf="_isShow" class="alarm-info">
+    <div class="alarm-header">
+      <h5 class="alarm-text"><i class="fa fa-bell-o"></i>&nbsp;Alerts Management</h5>
+      <a *ngIf="read_filter==0" class="envelopebtn" title="Alert settings" title="only show unread alerts" (click)="read_filter=1;setTableList()"><i class="fa fa-envelope-open-o"></i></a>
+      <a *ngIf="read_filter==1" class="envelopebtn" title="Alert settings" title="only show read alerts" (click)="read_filter=0;setTableList()"><i class="fa fa-envelope-o"></i></a>
+      <a class="markasreadbtn" title="Mark as read all selected items" (click)="markasRead()">{{cf.translate('Mark as read')}}</a>
+      <div class="soundDiv">
+          <input type="checkbox" class="form-check-input" [(ngModel)]="sound">
+          <label class="form-check-label"> {{cf.translate("Enable alert sound")}}</label>
+        </div>
+      <a *ngIf="is_admin" class="alarm-button" title="Alert settings" (click)="showSettingModal()"><i class="fa fa-cog"></i></a>
+      <a class="alarm-button" title="narrow"(click)="_isShow=false"><i class="fa fa-close"></i></a>
+    </div>
+    <div class="alarm-body">
+        <!-- <mat-form-field>
+            <mat-label>{{cf.translate('Search')}}</mat-label>
+            <input matInput (keyup)="applyFilter($event)" [placeholder]="cf.translate('Search')" #input>
+        </mat-form-field> -->
+        <div class="mat-elevation-z8 checkTable alarm-talbe-content">
+            <table mat-table [dataSource]="tableList" matSort style="width: 100%;">
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select" sticky>
+                <th mat-header-cell *matHeaderCellDef class="checkTh">
+                <mat-checkbox (change)="$event ? masterToggle() : null;onSelectionChange()"
+                                [checked]="selection.hasValue() && isAllSelected()"
+                                [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                [aria-label]="checkboxLabel()">
+                </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row" class="checkTh">
+                <mat-checkbox (click)="$event.stopPropagation()"
+                                (change)="$event ? selection.toggle(row) : null;onSelectionChange()"
+                                [checked]="selection.isSelected(row)"
+                                [aria-label]="checkboxLabel(row)">
+                </mat-checkbox>
+                </td>
+            </ng-container>
+            <ng-container *ngFor="let rows of tbCol; let i = index">
+                <ng-container *ngIf="specialCol.indexOf(rows)==-1" [matColumnDef]="rows">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate(tbHeader[i])}} </th>
+                <td mat-cell *matCellDef="let row"  [title]="row['description']"> {{row[rows]}} </td>
+                </ng-container>
+            </ng-container>
+            <!-- action -->
+            <ng-container matColumnDef="Action" stickyEnd>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="stickyOperationHeader-sm"> {{cf.translate('Action')}} </th>
+                <td mat-cell *matCellDef="let row" class="stickyOperationCell-sm">
+                <div class="btnRow">
+                    <div class="btn-group pr-1">
+                        <a *ngIf="row['is_read']==0" style="cursor:pointer" title="Mark as read" (click)="itemasRead(row,1)"><i class="fa fa-envelope-open-o"></i></a>
+                        <a *ngIf="row['is_read']==1" style="cursor:pointer" title="Mark as unread" (click)="itemasRead(row,0)"><i class="fa fa-envelope-o"></i></a>
+                    </div>
+                    <div class="btn-group">
+                        <a class="iconBTN" title="Alert remark" (click)="showEditModal(row)"><i class="fa fa-edit"></i></a>
+                    </div>
+                </div>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+            <!-- Row shown when there is no matching data. -->
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" colspan="4">No Item</td>
+            </tr>
+            </table>
+            <mat-paginator [pageSize]="15"></mat-paginator>
+            <!-- <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator> -->
+        </div>
+    </div>
+</div>    
+<!-- remark modal -->
+<div bsModal [config]="{backdrop: 'static',  keyboard: false}" #editModal="bs-modal" class="modal fade" tabindex="-1"
+  role="dialog" aria-labelledby="streamModal" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form [formGroup]="formGroup" (submit)="remark()">
+        <div class="modal-header">
+          <h6 class="modal-title">{{cf.translate('Alerts remark')}}</h6>
+          <button type="button" class="close" (click)="editModal.hide();" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group row  m-0 mb-4">
+                <label class="fixWidthLabel" style="width: 103px;">{{cf.translate("Operator")}}*</label>
+                <div class="fixInputDiv">
+                  <input type="text" class="form-control" formControlName="operator">
+                </div>
+            </div>
+            <div class="form-group row  m-0 mb-4">
+                <label class="fixWidthLabel" style="width: 103px;">{{cf.translate("Content")}}*</label>
+                <div class="fixInputDiv">
+                  <textarea class="form-control" formControlName="content"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary"
+            (click)="editModal.hide()">{{cf.translate("Close")}}</button>
+          <button type="submit"
+            class="btn btn-primary">{{cf.translate('Save')}}</button>
+        </div>
+      </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!--setting modal -->
+<div bsModal [config]="{backdrop: 'static',  keyboard: false}" #settingModal="bs-modal" class="modal fade" tabindex="-1"
+  role="dialog" aria-labelledby="streamModal" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="max-width: 600px !important;">
+    <div class="modal-content" style="width: 600px;">
+        <div class="modal-header headerDiv">
+          <h6 class="modal-title">{{cf.translate('Alert settings')}}</h6>
+          <button type="button" class="close" (click)="settingModal.hide();" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <tabset>
+            <tab heading="Basic">
+              <form [formGroup]="basicForm" (submit)="saveBasicInfo()" style="margin-top: 30px;">
+                <div class="form-group row  m-0 mb-4">
+                  <label class="fixWidthLabel" style="width: 250px;">{{cf.translate("Offline Alert Threshold(Min > 10)")}}:*</label>
+                  <div>
+                    <input type="text" class="form-control" formControlName="offline_range">
+                  </div>
+                </div>
+                <div class="form-group row  m-0 mb-4">
+                  <label class="fixWidthLabel" style="width: 250px;">{{cf.translate("Parking Alert Threshold(Min)")}}:*</label>
+                  <div>
+                    <input type="text" class="form-control" formControlName="parking_range">
+                  </div>
+                </div>
+                <div class="form-group row  m-0 mb-4">
+                  <label class="fixWidthLabel" style="width: 250px;">{{cf.translate("Idling Alert Threshold(Min)")}}:*</label>
+                  <div>
+                    <input type="text" class="form-control" formControlName="idling_range">
+                  </div>
+                  
+                </div>
+                <div class="form-group row  m-0 mb-4" style="justify-content: flex-end; margin-right: 52px !important;">
+                  <label class="fixWidthLabel" style="width: 100%; font-size: 12px;">{{cf.translate("With speed no more than(KM/H)")}}:*</label>
+                  <div>
+                    <input type="text" class="form-control" formControlName="idling_val">
+                  </div>
+                </div>
+                <div class="form-group row  m-0 mb-4" style="justify-content: flex-end; margin-right: 52px !important;">
+                  <button type="submit" class="btn btn-primary rigid">{{cf.translate('Save')}}</button>
+                  <button type="button" class="btn btn-primary rigid default"  (click)="settingModal.hide();">{{cf.translate('Cancel')}}</button>
+                </div>
+              </form>  
+            </tab>
+          </tabset>
+        </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

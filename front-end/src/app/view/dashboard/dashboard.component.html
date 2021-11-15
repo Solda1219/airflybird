@@ -1,0 +1,39 @@
+<mat-drawer-container class="side-nav-container" autosize>
+  <mat-drawer #drawer class="side-nav-sidenav" mode="side" [opened]="true">
+    <div class="nav-tile-text-bold text-center">{{cf.translate('Home')}}</div>
+    <span class="toggle-tree-btn">
+      <button type="button" class="btn btn-block btn-outline" (click)="drawer.toggle(); _opened = !_opened">
+        <i class="fa fa-caret-left" aria-hidden="true"></i>
+      </button>
+    </span>
+  <!--Left tabs -->
+  <div class="p-0 fixedheight">
+    <div *ngFor="let item of navItem" class="root">
+        <div *ngIf="!item.child"  [class]="curRoute&&curRoute.indexOf(item.url)==0?'root1 active':'root1'" (click)="route.navigateByUrl(item.url)">
+          <a class="root1a">{{cf.translate(item.name)}}</a>
+        </div>  
+        <div *ngIf="item.child" [class]="curRoute&&curRoute.indexOf(item.url)==0?'root1 active':'root1'" (click)="item.is_collapse=!item.is_collapse">
+          <a class="root1a">{{cf.translate(item.name)}}</a><i *ngIf="item.is_collapse" class="fa fa-angle-up arrowI"></i><i *ngIf="!item.is_collapse" class="fa fa-angle-down arrowI"></i>
+        </div> 
+        <div *ngIf="item.is_collapse">
+          <div *ngFor="let li of item.child">
+            <div [class]="curRoute&&curRoute.indexOf(li.url)==0?'childRoot activeA':'childRoot'" (click)="route.navigateByUrl(li.url)">
+              <a class="root1a">{{cf.translate(li.name)}}</a>
+            </div>  
+        </div>
+        </div>
+    </div>
+  </div>
+  </mat-drawer>
+  <div *ngIf="!_opened" class="d-md-down-none hambergerDIV">
+      <span class="toggle-tree-btn-right">
+          <button type="button" class="btn btn-block btn-outline"
+            (click)="drawer.toggle(); _opened = !_opened">
+            <i class="fa fa-caret-right" aria-hidden="true"></i>
+          </button>
+      </span>
+  </div>
+  <div class="side-nav-content">
+      <router-outlet></router-outlet>
+  </div>
+</mat-drawer-container>

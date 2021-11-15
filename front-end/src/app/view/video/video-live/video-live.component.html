@@ -1,0 +1,26 @@
+<div class="nav-tile-text">{{cf.translate('Live video')}}</div>
+<div class="form-group row p-3 pb-0 mb-0">
+  <div class="col-md-3 col-sm-6">
+    <select class="form-control" [(ngModel)]="params.live" (change)="search()">
+      <option value="all" selected>{{cf.translate('All live') }}</option>
+      <option value="living">{{cf.translate('Live streaming') }}</option>
+      <option value="unstart">{{cf.translate('Not yet live') }}</option>  
+    </select> 
+  </div>
+  <div class="col-md-3 col-sm-6">
+    <select class="form-control" [(ngModel)]="mode">
+      <option value="list" selected>{{cf.translate('List mode') }}</option>
+      <option value="block4">{{cf.translate('Quater screen') }}</option>
+      <option value="block16">{{cf.translate('Sixteen splite screen') }}</option>
+    </select> 
+  </div>
+  <div class="col-md-3 col-sm-6">
+    <input class="form-control" [(ngModel)]="params.q" [placeholder]="cf.translate('search for')" (change)="search()">
+  </div>
+</div>
+<div class="content p-3">
+  <app-video-live-list-mode *ngIf="mode=='list'" [item]="item"></app-video-live-list-mode>
+  <app-video-live-quater-mode *ngIf="mode=='block4'" [item]="item"></app-video-live-quater-mode>
+  <app-video-live-sixteen-mode *ngIf="mode=='block16'" [item]="item"></app-video-live-sixteen-mode>
+  <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+</div>

@@ -1,0 +1,23 @@
+.videoDiv video{
+    width:100%
+}
+.video-content{
+    display: flex;
+    flex-wrap: wrap;
+}
+.video-child4{
+    border:solid 1px white;
+    width:50%;
+}
+.video-child16{
+    border:solid 1px white;
+    width:25%;
+}
+.snap-content{
+    width: 80px;
+    height: 60px;
+}
+.snap-content:hover img{
+    transform: scale(1.5);
+    transition-delay: 0.1s;
+}

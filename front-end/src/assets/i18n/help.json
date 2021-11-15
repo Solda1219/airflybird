@@ -1,0 +1,155 @@
+{{ 'login' | translate }}
+{{ 'admin' | translate }}
+{{ 'agent' | translate }}
+{{ 'user' | translate }}
+{{ 'logout' | translate }}
+{{ 'register' | translate }}
+{{ 'ForgotPassword' | translate }}
+{{ 'I have not account.' | translate }}
+{{ 'Enter your mail to recover your password' | translate }}
+{{ 'Enter your phone number to recover your password' | translate }}
+
+{{ 'account' | translate }}
+{{ 'user name' | translate }}
+{{ 'realname' | translate }}
+{{ 'nickname' | translate }}
+
+{{ 'password' | translate }}
+{{ 'photo' | translate }}
+{{ 'car_number' | translate }}
+{{ 'company' | translate }}
+{{ 'contact' | translate }}
+{{ 'mail_box' | translate }}
+{{ 'phone' | translate }}
+{{ 'phone_number' | translate }}
+{{ 'address' | translate }}
+{{ 'license_number' | translate }}
+{{ 'tax_number' | translate }}
+{{ 'bank_account' | translate }}
+{{ 'created_at' | translate }}
+{{ 'created_by' | translate }}
+{{ 'available_from' | translate }}
+{{ 'available_to' | translate }}
+{{ 'status' | translate }}
+{{ 'role' | translate }}
+{{ 'action' | translate }}
+{{ 'information' | translate }}
+{{ 'delivery_date' | translate }}
+{{ 'camera_id' | translate }}
+{{ 'assign_status' | translate }}
+{{ 'run_status' | translate }}
+{{ 'model' | translate }}
+
+{{ 'Camera assign for company' | translate }}
+{{ 'Camera assign for individual' | translate }}
+
+
+{{ 'Company users' | translate }}&nbsp;{{ 'register' | translate }}
+
+
+{{ 'forgot password' | translate }}
+{{ 'reset password' | translate }}
+{{ 'previous password' | translate }}
+{{ 'new password' | translate }}
+{{ 'confirm password' | translate }}
+{{ 'Go to home' | translate }}
+
+{{ 'Save' | translate }}
+{{ 'Close' | translate }}
+{{ 'delete' | translate }}
+{{ 'upload image' | translate }}
+
+
+
+{{ 'Please provide your username and password to continue' | translate }}
+{{ 'Welcome' | translate }}
+{{ 'Sure' | translate }}
+{{ 'at least 8 length' | translate }}
+{{ 'Please provide a valid field.' | translate }}
+{{ 'password does not math' | translate }}
+{{ 'Please upload image and use url.' | translate }}
+
+{{ 'Home' | translate }}
+{{ 'results' | translate }}
+
+{{ 'User manage' | translate }}
+{{ 'System users' | translate }}
+{{ 'Company users' | translate }}
+{{ 'Individual users' | translate }}
+{{ 'Device manage' | translate }}
+{{ 'Camera register' | translate }}
+{{ 'Camera users' | translate }}
+{{ 'Landing page' | translate }}
+{{ 'Monitor' | translate }}
+{{ 'Vehicle monitor' | translate }}
+{{ 'Routing' | translate }}
+{{ 'Replay' | translate }}
+{{ 'Reports' | translate }}
+{{ 'Service' | translate }}
+{{ 'About' | translate }}
+{{ 'Contact' | translate }}
+{{ 'Console' | translate }}
+
+<img [src]="item.avatar" (error)="item.avatar = defaultImage" class="avatar_img">
+  defaultImage="assets/img/error/unknown.jpg";
+
+fa-home
+fa-plus
+fa-search
+fa-edit
+fa-trash
+
+<nav aria-label="breadcrumb">
+<ol class="breadcrumb pl-0">
+  <li class="breadcrumb-item"><a routerLink="/"><i class="fas fa fa-home"></i> {{ 'Home' | translate }}</a>
+  </li>
+  <li class="breadcrumb-item"><a>{{ 'User manage' | translate }}</a>
+  </li>
+  <li class="breadcrumb-item active" aria-current="page">{{ 'Company users' | translate }}</li>
+</ol>
+</nav>
+
+<div class="row">
+<div class="col-md-6 col-sm-6 row">
+  <div style="text-align: left; width: 50%; padding:8px">
+    <h6>{{ 'Company users' | translate }}</h6>
+  </div>
+  <div style="text-align: right;  width: 50%; padding:8px">
+    {{data.length}}&nbsp;{{ 'results' | translate }}
+  </div> 
+</div>
+<div class="col-md-6 col-sm-6 row">
+  <div style="width: 50%;">
+    <input type="search" class="form-control" name="search" placeholder="Search here..." [(ngModel)]="key">
+  </div>
+  <div style="width: 50%;">
+    <button type="button" class="ms-btn-icon btn-pill btn-success float-right" data-toggle="modal" data-target="#modal-1" (click)="add()" ><i class="fas fa fa-plus"></i></button>
+  </div> 
+</div>
+</div>
+
+<button type="button" class="ms-btn-icon btn-pill btn-success" (click)="edit(item.id)"
+data-toggle="modal" data-target="#modal-1"><i class="fas fa fa-edit"></i></button>
+<button type="button" class="ms-btn-icon btn-pill btn-danger" (click)="del(item.id)"
+data-toggle="modal" data-target="#modal-del"><i class="fas fa fa-trash"></i></button>
+
+<div class="modal fade" id="modal-del" tabindex="-1" role="dialog" aria-labelledby="modal-del">
+<div class="modal-dialog modal-dialog-centered modal-max" role="document">
+  <div class="modal-content">
+
+    <div class="modal-body">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+          aria-hidden="true">&times;</span></button>
+      <h1>{{ 'Sure' | translate }}
+      </h1>
+      <div class="d-flex justify-content-between">
+        <button type="button" class="btn btn-light" data-dismiss="modal">{{ 'Close' | translate }}
+        </button>
+        <button type="button" class="btn btn-primary shadow-none" (click)="deleteItem()"
+          data-dismiss="modal">{{ 'delete' | translate }}</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>

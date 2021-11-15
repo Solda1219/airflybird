@@ -1,0 +1,73 @@
+<mat-drawer-container class="side-nav-container" autosize>
+    <mat-drawer #drawer class="side-nav-sidenav" mode="side" [opened]="true">
+      <div class="nav-tile-text-bold text-center">{{cf.translate('Device')}}</div>
+      <span class="toggle-tree-btn">
+        <button type="button" class="btn btn-block btn-outline" (click)="drawer.toggle(); _opened = !_opened">
+          <i class="fa fa-caret-left" aria-hidden="true"></i>
+        </button>
+      </span>
+      <div class="p-3">
+        <app-customer-list-tree (selectedItems)="treeViewChange($event)"></app-customer-list-tree>
+      </div>
+    </mat-drawer>
+    <div *ngIf="!_opened" class="d-md-down-none hambergerDIV">
+        <span class="toggle-tree-btn-right">
+            <button type="button" class="btn btn-block btn-outline"
+              (click)="drawer.toggle(); _opened = !_opened">
+              <i class="fa fa-caret-right" aria-hidden="true"></i>
+            </button>
+        </span>
+    </div>
+    <div class="side-nav-content">
+      <div class="nav-tile-text">{{cf.translate('Vod Video')}}</div>
+      <div class="card-body">
+        <form [formGroup]="formGroup" class="form-horizontal" (submit)="search()">
+          <div class="form-group row">
+            <div class="col-md-2 col-sm-6">
+              <select class="form-control" formControlName="dateDefine" (change)="dateDefine()">
+                <option value="0">{{cf.translate("today")}}</option>
+                <option value="1">{{cf.translate("this week")}}</option>
+                <option value="2">{{cf.translate("this month")}}</option>
+                <option value="9">{{cf.translate("History")}}</option>
+              </select>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <input type="date" class="form-control" formControlName="startdate">
+             </div>
+             <div class="col-md-3 col-sm-6">
+              <input type="date" class="form-control" formControlName="enddate">
+             </div>
+            <div class="col-md-4 p-0">
+                <button type="submit" class="btn btn-primary rigid-btn-sm">{{cf.translate('Search')}}</button>
+                <button type="button" class="btn btn-outline-dark rigid-btn-sm rigid-default" (click)="reset()">{{cf.translate('Reset')}}</button>
+                <button type="button" class="btn btn-outline-dark rigid-btn-sm rigid-default" (click)="delSeleted()">{{cf.translate('Delete')}}</button>
+            </div>
+          </div>
+        </form>
+    </div>     
+      <div class="content">
+        <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+        <app-video-vod-content [item]="item" (deleteItems)="del($event)" (selectedItems)="selectedItems=$event"></app-video-vod-content>
+      </div>
+    </div>
+  </mat-drawer-container>
+  <!-- warning modal -->
+  <div bsModal #warningModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-warning" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">{{cf.translate('Are you sure?')}}</h4>
+          <button type="button" class="close" (click)="warningModal.hide()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>{{cf.translate("You won't be able to revert this!")}}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="warningModal.hide()">{{cf.translate("Close")}}</button>
+          <button type="button" class="btn btn-warning" (click)="warningModal.hide();deleteAll()">{{cf.translate("Yes, delete this!")}}</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->

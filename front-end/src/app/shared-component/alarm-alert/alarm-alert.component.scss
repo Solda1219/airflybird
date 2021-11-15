@@ -1,0 +1,96 @@
+.alarmBtn{
+    position:fixed;
+    right: 50px;
+    bottom: 50px;
+    z-index: 1000;
+}
+.alarmBtn button{
+    height: 45px;
+    width: 45px;
+}
+.alarm-info { 
+    position: fixed; 
+    right:0; 
+    bottom: 0;  
+    z-index: 1033; 
+    width: 860px;  
+    border:1px solid #ccc; 
+    box-shadow: 0 0 3px rgba(0,0,0,.2); 
+    background-color: #fff;
+}
+.alarm-button{
+    padding: 0px;
+    height: 36px;
+    width: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: solid 1px #ddd;
+    cursor:pointer
+}
+.alarm-text{
+   width: 100%;
+   margin: 0px !important;
+   display: flex;
+   align-items: center;
+   padding-left: 8px;
+   font-size: 15px;
+   font-weight: 400;
+}
+.alarm-header{
+    display: flex;
+    background-color: #e7f1fb;
+    border-bottom: solid 1px #ddd;
+}
+.alarm-body{
+    min-height: 250px;
+}
+.alarm-talbe-content{
+    height: 250px;
+    overflow-y: auto;
+    width: 100%;
+}
+.markasreadbtn{
+    width: 140px;
+    align-self: center;
+    color: #20a8d8 !important;
+    cursor: pointer;
+}
+.envelopebtn{
+    padding: 0px;
+    height: 36px;
+    width: 70px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+.soundDiv{
+    width: 191px;
+    margin-left: 20px;
+    display: flex;
+    align-items: center;
+}
+.iconBTN{
+    font-size: 17px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.form-group{
+    justify-content: center;
+}
+.headerDiv{
+    padding: 11px 18px;
+    background-color: #ddd6;
+}
+.rigid{
+    border-radius: 0px;
+    width: 60px;
+}
+.default{
+    background-color: white;
+    color: black;
+    margin-left: 10px;
+    border-color: #ddd;
+}

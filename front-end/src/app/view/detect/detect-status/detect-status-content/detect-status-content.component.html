@@ -1,0 +1,77 @@
+<div class="mat-table-content-one">
+    <mat-form-field>
+      <mat-label>{{cf.translate('Search')}}</mat-label>
+      <input matInput (keyup)="applyFilter($event)" [placeholder]="cf.translate('Search')" #input>
+    </mat-form-field>
+    <div class="mat-elevation-z8 checkTable">
+      <table mat-table [dataSource]="tableList" matSort>
+        <!-- Checkbox Column -->
+        <ng-container matColumnDef="select" sticky>
+          <th mat-header-cell *matHeaderCellDef class="checkTh">
+            <mat-checkbox (change)="$event ? masterToggle() : null;onSelectionChange()"
+                          [checked]="selection.hasValue() && isAllSelected()"
+                          [indeterminate]="selection.hasValue() && !isAllSelected()"
+                          [aria-label]="checkboxLabel()">
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row" class="checkTh">
+            <mat-checkbox (click)="$event.stopPropagation()"
+                          (change)="$event ? selection.toggle(row) : null;onSelectionChange()"
+                          [checked]="selection.isSelected(row)"
+                          [aria-label]="checkboxLabel(row)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+        <ng-container *ngFor="let rows of tbCol; let i = index">
+          <ng-container *ngIf="specialCol.indexOf(rows)==-1" [matColumnDef]="rows">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate(tbHeader[i])}} </th>
+            <td mat-cell *matCellDef="let row"> {{row[rows]}} </td>
+          </ng-container>
+          <ng-container *ngIf="rows=='status'" [matColumnDef]="'status'">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate(tbHeader[i])}} </th>
+            <td mat-cell *matCellDef="let row"> 
+              <span [class]="row[rows]==3?'badge badge-success':'badge badge-danger'"> {{row[rows]==3?'Downloaded':'Not downloaded'}}</span>
+            </td>
+          </ng-container>
+          <ng-container *ngIf="rows=='detect_status'" [matColumnDef]="'detect_status'">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate(tbHeader[i])}} </th>
+            <td mat-cell *matCellDef="let row"> 
+              <span *ngIf="row[rows]==0" class="badge badge-danger"> {{cf.translate('Not detected')}}</span>
+              <span *ngIf="row[rows]==1" class="badge badge-warning"> {{cf.translate('Detecting')}}</span>
+              <span *ngIf="row[rows]==2" class="badge badge-success"> {{cf.translate('Detected')}}</span>
+            </td>
+          </ng-container>
+          <ng-container *ngIf="rows=='wrong_detect_result_info'" [matColumnDef]="'wrong_detect_result_info'">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{cf.translate(tbHeader[i])}} </th>
+            <td mat-cell *matCellDef="let row"> 
+              <progressbar *ngIf="row['wrong_detect_result_percent']!=-1" class="progress progress-striped progress-animated" [value]="row['wrong_detect_result_percent']" [max]="100" [type]="getType(row['wrong_detect_result_percent'])" style="background-color: #c8ced3;">
+                <div class="onTop"> {{row['wrong_detect_result_info']}}</div>
+              </progressbar>
+            </td>
+          </ng-container>
+        </ng-container>
+        <!-- action -->
+        <ng-container matColumnDef="Action" stickyEnd>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="stickyOperationHeader-sm"> {{cf.translate('Action')}} </th>
+          <td mat-cell *matCellDef="let row" class="stickyOperationCell-sm">
+            <div class="btnRow">
+                <div class="btn-group">
+                    <!-- <a class="btnCC badge badge-info mfs-2" (click)="setModal(row)">{{cf.translate('play')}}</a> -->
+                </div>
+                <div class="btn-group">
+                    <!-- <a class="btnCC badge badge-danger mfs-2" (click)="willDelete=row;warningModal.show()">{{cf.translate('delete')}}</a> -->
+                </div>
+            </div>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    
+        <!-- Row shown when there is no matching data. -->
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="4">No Item</td>
+        </tr>
+      </table>
+    </div>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100, 500, 1000]" [pageSize]="10"></mat-paginator>
+</div>
