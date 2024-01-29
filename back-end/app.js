@@ -19,7 +19,8 @@ app.use(express.json({limit: "50mb"}));
 app.use(express.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
 // Logging
 // app.use(morgan('dev'));
-//routing
+//routing to backend
+
 app.use('/_api', webRoute);
 //Proxy endpoints
 app.use('/live_api', createProxyMiddleware({
